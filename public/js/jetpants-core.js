@@ -166,6 +166,7 @@ Y.extend(Jetpants, Y.Base, {
     Y.on(JETPANTS + '|history-lite:change', this._onHistoryChange, this);
     this.get(SEARCH_FORM_NODES).on(JETPANTS + '|submit', this._onSubmit, this);
 
+    search.on('searchStart', this._onSearchStart, this);
     search.on('searchSuccess', this._onSearchSuccess, this);
   },
 
@@ -254,7 +255,6 @@ Y.extend(Jetpants, Y.Base, {
       if (changed.q) {
         DOM.removeClass(doc.documentElement, 'entry');
         this.set(PENDING_QUERY, changed.q);
-        doc.title = changed.q + ' - Jetpants Search'
       }
 
       this.fire(EVT_SEARCH, {
@@ -271,6 +271,14 @@ Y.extend(Jetpants, Y.Base, {
   },
 
   /**
+   * @method _onSearchStart
+   * @protected
+   */
+  _onSearchStart: function (e) {
+    doc.title = e.query + ' - Jetpants Search';
+  },
+
+  /**
    * Handles a successful search request.
    *
    * @method _onSearchSuccess
@@ -281,6 +289,7 @@ Y.extend(Jetpants, Y.Base, {
 
     search.renderInfo(Y.one('#bd .info'));
     search.renderResults(Y.one('#results .web'));
+    search.renderPagination(Y.one('#bd .pg'));
 
     this.get(QUERY_NODES).item(0).blur();
   },

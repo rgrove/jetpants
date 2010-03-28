@@ -23,9 +23,26 @@ var doc  = Y.config.doc,
 QUERY   = 'query',
 RESULTS = 'results',
 
-EVT_SEARCH_END     = 'searchEnd',
+// -- Public Events ------------------------------------------------------------
+
+/**
+ * @event searchEnd
+ */
+EVT_SEARCH_END = 'searchEnd',
+
+/**
+ * @event searchFailure
+ */
 EVT_SEARCH_FAILURE = 'searchFailure',
-EVT_SEARCH_START   = 'searchStart',
+
+/**
+ * @event searchStart
+ */
+EVT_SEARCH_START = 'searchStart',
+
+/**
+ * @event searchSuccess
+ */
 EVT_SEARCH_SUCCESS = 'searchSuccess';
 
 // -- Static Properties --------------------------------------------------------
@@ -61,24 +78,6 @@ Search.ATTRS = {
   }
 };
 
-// -- Public Events ------------------------------------------------------------
-
-/**
- * @event searchEnd
- */
-
-/**
- * @event searchFailure
- */
-
-/**
- * @event searchStart
- */
-
-/**
- * @event searchSuccess
- */
-
 Y.extend(Search, Y.Base, {
   // -- Public Instance Methods ------------------------------------------------
   // initializer: function (config) {},
@@ -108,6 +107,80 @@ Y.extend(Search, Y.Base, {
         '<strong>' + this.encodeEntities(this.get(QUERY)) + '</strong>' +
       '</p>'
     );
+  },
+
+  renderPagination: function (parent) {
+    var parentNode = Y.one(parent),
+        results    = this.get(RESULTS),
+        pagination = {},
+        query      = this.get(QUERY),
+        currentPage, i, li, pages, queryParams, queryString, ul;
+
+    parentNode.get('children').remove();
+
+    if (results.totalhits === 0) {
+      currentPage = 1;
+      pages       = 1;
+    } else {
+      pages       = Math.min(100, Math.ceil(results.totalhits / results.count));
+      currentPage = Math.ceil(results.start / results.count);
+    }
+
+    if (pages === 1) {
+      return;
+    }
+
+    pagination.start = Math.max(1, currentPage - 5);
+    pagination.end   = Math.min(pagination.start + 9, pages);
+
+    queryParams = {
+      q    : query,
+      count: results.count
+    };
+
+    ul = Node.create('<ul/>');
+
+    if (currentPage > 1) {
+      queryString = this._buildQueryString(Y.merge(queryParams, {
+        start: ((currentPage - 2) * results.count) + 1
+      }));
+
+      ul.append(
+        '<li class="prev">' +
+          '<a href="#' + queryString + '" rel="prev">Prev</a>' +
+        '</li>'
+      );
+    }
+
+    for (i = pagination.start; i <= pagination.end; ++i) {
+      queryString = this._buildQueryString(Y.merge(queryParams, {
+        start: ((i - 1) * results.count) + 1
+      }));
+
+      li = Node.create('<li/>');
+
+      if (i === currentPage) {
+        li.append('<strong>' + i + '</strong>');
+      } else {
+        li.append('<a href="#' + queryString + '">' + i + '</a>');
+      }
+
+      ul.append(li);
+    }
+
+    if (pagination.end > currentPage) {
+      queryString = this._buildQueryString(Y.merge(queryParams, {
+        start: (currentPage * results.count) + 1
+      }));
+
+      ul.append(
+        '<li class="next">' +
+          '<a href="#' + queryString + '" rel="next">Next</a>' +
+        '</li>'
+      );
+    }
+
+    parentNode.append(ul);
   },
 
   renderResults: function (parent) {

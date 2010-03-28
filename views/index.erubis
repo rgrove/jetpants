@@ -24,6 +24,7 @@
     <div class="info"><p class="loading">Loading...</p></div>
     <div id="results">
       <div class="web"></div>
+      <div class="pg"></div>
     </div>
   </div>
 

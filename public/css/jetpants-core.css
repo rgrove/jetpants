@@ -2,7 +2,10 @@ html {
   background: #fff;
   color: #000;
   font: 12px Helvetica, Arial, sans-serif;
+  overflow-y: scroll;
 }
+
+html.entry { overflow-y: auto; }
 
 a { text-decoration: none; }
 
@@ -10,21 +13,19 @@ a:link { color: #0033cc; }
 a:visited { color: #663399; }
 a:hover { text-decoration: underline; }
 
-body { margin: 0; }
-body.loading { display: none; }
-
-#doc {
-  margin: 8px 16px;
-  min-width: 600px;
-  max-width: 970px;
+body {
+  margin: 0;
+  padding: 12px 24px;
 }
 
+#doc { min-width: 600px; }
 .entry #doc { max-width: none; }
+.loading #doc { display: none; }
 
 /* -- Header ---------------------------------------------------------------- */
 #hd {
   border-bottom: 2px solid #afd7ff;
-  padding-bottom: 10px;
+  padding-bottom: 14px;
 }
 
 .entry #hd { border: 0; }
@@ -82,6 +83,11 @@ body.loading { display: none; }
 }
 
 /* -- Body ------------------------------------------------------------------ */
+#bd {
+  background: #fff;
+  border-top: 0;
+}
+
 .entry #bd { display: none; }
 
 .info {
@@ -124,6 +130,54 @@ body.loading { display: none; }
 
 .web .title a { text-decoration: underline; }
 
+/* -- Pagination ------------------------------------------------------------ */
+.pg {
+  margin: 2em 0 1em;
+}
+
+.pg:after {
+  clear: left;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+.pg a,
+.pg strong {
+  border: 1px solid #c7dbff;
+  display: block;
+  padding: 0.3em 0.6em;
+  text-align: center;
+}
+
+.pg a {
+  color: #0033cc;
+  text-decoration: none;
+}
+
+.pg a:hover { border-color: #2663CF; }
+
+.pg li {
+  float: left;
+  margin-right: 0.3em;
+}
+
+.pg strong {
+  background: #2663CF;
+  border-color: #2663CF;
+  color: #fff;
+  font-weight: bold;
+}
+
+.pg ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pg .next,
+.pg .prev { font-weight: bold; }
+
 /* -- Footer ---------------------------------------------------------------- */
 #ft {
   border-top: 2px solid #afd7ff;
@@ -132,8 +186,10 @@ body.loading { display: none; }
 
 .entry #ft { display: none; }
 
+#ft p,
+#ft p a { color: #cfcfcf; }
+
 #ft p {
-  color: #bfbfbf;
   font-size: 11px;
   margin: 0;
   text-align: right;
