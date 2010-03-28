@@ -15,8 +15,10 @@
 <div id="doc">
   <div id="hd">
     <form class="sf" method="get" action="/" role="search">
-      <input type="search" name="q" class="q" placeholder="Search the Internets!" tabindex="0">
-      <input type="submit" class="sb" value="Search">
+      <div>
+        <input type="search" name="q" class="q" placeholder="Search the Internets!" tabindex="0">
+        <input type="submit" class="sb" value="Search">
+      </div>
     </form>
   </div>
 

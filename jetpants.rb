@@ -66,3 +66,7 @@ get '/api/search' do
 
   Yajl::Encoder.encode(search_web(query, :count => count, :start => start))
 end
+
+not_found do
+  erubis :'error/404'
+end

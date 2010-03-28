@@ -148,8 +148,9 @@ Jetpants.ATTRS = {
 Y.extend(Jetpants, Y.Base, {
   // -- Public Instance Methods ------------------------------------------------
   initializer: function (config) {
-    this.publish(EVT_SEARCH, {defaultFn: this._defSearchHandler});
+    this._parseQueryString();
 
+    this.publish(EVT_SEARCH, {defaultFn: this._defSearchHandler});
     this._search = new Y.Jetpants.Search();
 
     this._attachEvents();
@@ -174,6 +175,14 @@ Y.extend(Jetpants, Y.Base, {
   _detachEvents: function () {
     this._search.destroy();
     Y.detach(JETPANTS + '|*');
+  },
+
+  _parseQueryString: function () {
+    var queryString = win.location.search;
+
+    if (queryString) {
+      win.location = win.location.pathname + '#' + queryString.substr(1);
+    }
   },
 
   _render: function () {

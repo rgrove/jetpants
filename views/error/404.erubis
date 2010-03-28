@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>404 Not Found</title>
+  <link rel="stylesheet" type="text/css" href="/css/404.css">
+</head>
+<body role="document">
+
+<div id="doc">
+  <div id="bd">
+    <h1>404 Not Found</h1>
+
+    <p>
+    The requested URL was not found on this server. Perhaps you'd like to search
+    for it?
+    </p>
+
+    <form class="sf" method="get" action="/" role="search">
+      <div>
+        <input type="text" name="q" class="q" placeholder="Search the Internets!"
+            value="<%== request.path.gsub('/', ' ').strip %>" autofocus>
+        <input type="submit" class="sb" value="Search">
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>
