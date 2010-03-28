@@ -37,7 +37,7 @@ Search.ATTRS = {
    * @attribute apiUrl
    * @type String
    */
-  apiUrl: {value: '/api/search/%query'},
+  apiUrl: {value: '/api/search'},
 
   /**
    * Query from the most recent search request, if any.
@@ -130,8 +130,8 @@ Y.extend(Search, Y.Base, {
   },
 
   search: function (query, config) {
-    var params = {},
-        url    = this.get('apiUrl').replace('%query', query || this.get(QUERY)),
+    var params = {q: query},
+        url    = this.get('apiUrl'),
         facade;
 
     config = Y.merge({
@@ -176,10 +176,8 @@ Y.extend(Search, Y.Base, {
         },
 
         start: function () {
-          this._setAttrs({
-            results: {},
-            query  : query
-          });
+          this._set(QUERY, query);
+          this._set(RESULTS, {});
 
           this.fire(EVT_SEARCH_START, facade);
         },

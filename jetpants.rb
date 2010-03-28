@@ -43,10 +43,15 @@ get '/' do
   erubis :index
 end
 
-get '/api/search/:query' do |query|
+get '/api/search' do
+  content_type 'application/json', :charset => 'utf-8'
+
+  unless query = params[:q]
+    # TODO: return 400
+  end
+
   count = (params[:count] || 10).to_i
   start = (params[:start] || 1).to_i
 
-  content_type 'application/json', :charset => 'utf-8'
   Yajl::Encoder.encode(search_web(query, :count => count, :start => start))
 end
