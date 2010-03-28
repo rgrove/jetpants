@@ -1,0 +1,140 @@
+html {
+  background: #fff;
+  color: #000;
+  font: 12px Helvetica, Arial, sans-serif;
+}
+
+a { text-decoration: none; }
+
+a:link { color: #0033cc; }
+a:visited { color: #663399; }
+a:hover { text-decoration: underline; }
+
+body { margin: 0; }
+body.loading { display: none; }
+
+#doc {
+  margin: 8px 16px;
+  min-width: 600px;
+  max-width: 970px;
+}
+
+.entry #doc { max-width: none; }
+
+/* -- Header ---------------------------------------------------------------- */
+#hd {
+  border-bottom: 2px solid #d4e8ff;
+  padding-bottom: 10px;
+}
+
+.entry #hd { border: 0; }
+
+/* Search form */
+.entry .sf {
+  margin: 15% auto 0;
+  width: 500px;
+}
+
+.q,
+.sb {
+  font-size: 16px;
+  padding: 5px 10px;
+  -moz-border-radius: 2px;
+}
+
+.webkit .q,
+.webkit .sb {
+  padding: 4px 0;
+  -webkit-border-radius: 2px;
+}
+
+/* Search query */
+.q {
+  border: 1px solid #d4e8ff;
+  width: 480px;
+}
+
+.webkit .q {
+  width: 500px;
+  -webkit-appearance: textfield;
+}
+
+.entry .q { width: 380px; }
+.entry.webkit .q { width: 400px; }
+
+/* Search button */
+.sb {
+  background: -moz-linear-gradient(top, #80c0ed, #456e99);
+  background: -webkit-gradient(linear, left top, left bottom, from(#80c0ed), to(#456e99));
+  border: 1px solid #4573a6;
+  color: #fff;
+  cursor: pointer;
+  margin-left: 3px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  width: 90px;
+}
+
+.sb:focus,
+.sb:hover {
+  background: -moz-linear-gradient(top, #a8dcff, #547fab);
+  background: -webkit-gradient(linear, left top, left bottom, from(#a8dcff), to(#547fab));
+}
+
+/* -- Body ------------------------------------------------------------------ */
+.entry #bd { display: none; }
+
+.info {
+  background: #eff7ff;
+  padding: 4px 6px;
+  text-align: right;
+}
+
+.info p { margin: 0; }
+.info p.loading { color: #afafaf; }
+
+/* -- Results --------------------------------------------------------------- */
+#results { padding: 10px 0 16px 8px; }
+
+.web {
+  font-size: 13px;
+  line-height: 1.3em;
+}
+
+.web cite {
+  color: #568e1a;
+  font-style: normal;
+  word-wrap: break-word;
+}
+
+.web li { margin-top: 1.3em; }
+
+.web ol {
+  list-style: none;
+  padding: 0;
+}
+
+.web .abstract { max-width: 42em; }
+
+.web .title {
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+}
+
+.web .title a { text-decoration: underline; }
+
+/* -- Footer ---------------------------------------------------------------- */
+#ft {
+  border-top: 2px solid #d4e8ff;
+  padding: 4px 6px;
+}
+
+.entry #ft { display: none; }
+
+#ft p {
+  color: #bfbfbf;
+  font-size: 11px;
+  margin: 0;
+  text-align: right;
+}

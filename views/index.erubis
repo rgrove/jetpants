@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html class="entry">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>Jetpants</title>
+  <link rel="stylesheet" type="text/css" href="/css/jetpants-core.css">
+  <script src="http://yui.yahooapis.com/combo?3.1.0pr4/build/yui/yui-min.js&amp;3.1.0pr4/build/loader/loader-min.js"></script>
+  <script src="/js/history-lite.js"></script>
+  <script src="/js/jetpants-core.js"></script>
+  <script src="/js/jetpants-search.js"></script>
+  <script>Y=YUI().use('jetpants-core');</script>
+</head>
+<body class="loading">
+
+<div id="doc">
+  <div id="hd">
+    <form class="sf" method="get" action="/">
+      <input type="search" name="q" class="q" placeholder="Search the Internets!" tabindex="0">
+      <input type="submit" class="sb" value="Search">
+    </form>
+  </div>
+
+  <div id="bd">
+    <div class="info"><p class="loading">Loading...</p></div>
+    <div id="results">
+      <div class="web"></div>
+    </div>
+  </div>
+
+  <div id="ft">
+    <p>
+      Copyright &copy; 2010 <a href="http://wonko.com/">Ryan Grove</a>.
+      All rights reserved.
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
