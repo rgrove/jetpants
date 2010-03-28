@@ -10,25 +10,28 @@
   <script src="/js/jetpants-search.js"></script>
   <script>Y=YUI().use('jetpants-core');</script>
 </head>
-<body class="loading">
+<body class="loading" role="document">
 
 <div id="doc">
   <div id="hd">
-    <form class="sf" method="get" action="/">
+    <form class="sf" method="get" action="/" role="search">
       <input type="search" name="q" class="q" placeholder="Search the Internets!" tabindex="0">
       <input type="submit" class="sb" value="Search">
     </form>
   </div>
 
   <div id="bd">
-    <div class="info"><p class="loading">Loading...</p></div>
-    <div id="results">
+    <div class="info" role="status"><p class="loading">Loading...</p></div>
+    <div id="results" role="main">
+      <h2 class="ol">Web Results</h2>
       <div class="web"></div>
+
+      <h2 class="ol">Pagination</h2>
       <div class="pg"></div>
     </div>
   </div>
 
-  <div id="ft">
+  <div id="ft" role="contentinfo">
     <p>
       Copyright &copy; 2010 <a href="http://wonko.com/">Ryan Grove</a>.
       All rights reserved.

@@ -138,7 +138,7 @@ Y.extend(Search, Y.Base, {
       count: results.count
     };
 
-    ul = Node.create('<ul/>');
+    ul = Node.create('<ul role="navigation"/>');
 
     if (currentPage > 1) {
       queryString = this._buildQueryString(Y.merge(queryParams, {

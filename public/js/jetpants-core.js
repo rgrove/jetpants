@@ -17,6 +17,7 @@ function Jetpants(config) {
 
 // -- Shorthand ----------------------------------------------------------------
 var doc     = Y.config.doc,
+    win     = Y.config.win,
     DOM     = Y.DOM,
     History = Y.HistoryLite,
     Lang    = Y.Lang,
@@ -68,7 +69,7 @@ Jetpants.ATTRS = {
     },
 
     setter: function (value) {
-      History.add({q: value});
+      History.add({q: value, start: null});
       return value;
     }
   },
@@ -252,15 +253,20 @@ Y.extend(Jetpants, Y.Base, {
     if (changed.q || changed.count || changed.start || removed.count ||
         removed.start) {
 
+      this.setAttrs({
+        resultCount: newParsed.count || 10,
+        resultStart: newParsed.start || 1
+      });
+
       if (changed.q) {
         DOM.removeClass(doc.documentElement, 'entry');
         this.set(PENDING_QUERY, changed.q);
       }
 
       this.fire(EVT_SEARCH, {
-        count: newParsed.count || this.get(RESULT_COUNT),
+        count: this.get(RESULT_COUNT),
         query: newParsed.q,
-        start: newParsed.start || this.get(RESULT_START)
+        start: this.get(RESULT_START)
       });
     } else if (removed.q) {
       DOM.addClass(doc.documentElement, 'entry');
@@ -287,11 +293,13 @@ Y.extend(Jetpants, Y.Base, {
   _onSearchSuccess: function (e) {
     var search = this._search;
 
+    win.scroll(0, 0);
+
     search.renderInfo(Y.one('#bd .info'));
     search.renderResults(Y.one('#results .web'));
     search.renderPagination(Y.one('#bd .pg'));
 
-    this.get(QUERY_NODES).item(0).blur();
+    Y.one('#results .web a').focus();
   },
 
   /**
@@ -306,7 +314,7 @@ Y.extend(Jetpants, Y.Base, {
   }
 });
 
-Y.mix(Y.Jetpants, new Jetpants());
+Y.Jetpants = new Jetpants();
 
 }, '1.0.0', {
     requires: [
