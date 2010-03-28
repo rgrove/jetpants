@@ -254,6 +254,7 @@ Y.extend(Jetpants, Y.Base, {
       if (changed.q) {
         DOM.removeClass(doc.documentElement, 'entry');
         this.set(PENDING_QUERY, changed.q);
+        doc.title = changed.q + ' - Jetpants Search'
       }
 
       this.fire(EVT_SEARCH, {
@@ -264,6 +265,7 @@ Y.extend(Jetpants, Y.Base, {
     } else if (removed.q) {
       DOM.addClass(doc.documentElement, 'entry');
       this.set(PENDING_QUERY, '');
+      doc.title = 'Jetpants Search';
       this.get(QUERY_NODES).item(0).focus();
     }
   },
