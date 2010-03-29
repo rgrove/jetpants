@@ -2,6 +2,7 @@
 require 'rubygems'
 
 require 'bossman'
+require 'cgi'
 require 'erubis'
 require 'sinatra'
 require 'yajl'
@@ -46,10 +47,16 @@ helpers do
 end
 
 get '/' do
+  # Convert all query parameters into hash parameters and redirect.
+  unless params.empty?
+    hash = params.map{|p| CGI.escape(p[0]) + '=' + CGI.escape(p[1])}.join('&')
+    redirect("/##{hash}")
+  end
+
   content_type('text/html', :charset => 'utf-8')
   cache_control(:public, :max_age => 1800)
 
-  erubis :index
+  erubis(:index)
 end
 
 get '/api/search' do
