@@ -1,3 +1,6 @@
+/*global YUI */
+/*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: false, onevar: true, plusplus: false, white: false */
+
 /**
  * Jetpants core module.
  *
