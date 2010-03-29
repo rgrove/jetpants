@@ -16,13 +16,7 @@
     for it?
     </p>
 
-    <form class="sf" method="get" action="/" role="search">
-      <div>
-        <input type="text" name="q" class="q" placeholder="Search the Internets!"
-            value="<%== request.path.gsub('/', ' ').strip %>" autofocus>
-        <input type="submit" class="sb" value="Search">
-      </div>
-    </form>
+    <%= erubis(:'partial/searchbox') %>
   </div>
 </div>
 

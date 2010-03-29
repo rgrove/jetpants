@@ -75,5 +75,6 @@ get '/api/search' do
 end
 
 not_found do
-  erubis :'error/404'
+  @q = CGI.unescape(request.path.gsub('/', ' ').strip)
+  erubis(:'error/404')
 end
