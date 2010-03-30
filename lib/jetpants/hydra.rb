@@ -1,5 +1,5 @@
 require 'typhoeus'
-require 'hydra/provider'
+require 'jetpants/hydra/provider'
 
 class Jetpants; class Hydra
   attr_reader :providers

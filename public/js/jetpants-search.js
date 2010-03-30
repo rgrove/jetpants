@@ -105,7 +105,7 @@ Y.extend(Search, Y.Base, {
     parentNode.get('children').remove();
     parentNode.append(
       '<p>' +
-        'Results <strong>' + results.start + ' - ' + (results.start + results.count - 1) + '</strong> ' +
+        'Results <strong>' + (results.start + 1) + ' - ' + (results.start + results.count) + '</strong> ' +
         'of about <strong>' + this.formatNumber(results.deephits) + '</strong> for ' +
         '<strong>' + this.encodeEntities(this.get(QUERY)) + '</strong>' +
       '</p>'
@@ -126,7 +126,7 @@ Y.extend(Search, Y.Base, {
       pages       = 1;
     } else {
       pages       = Math.min(100, Math.ceil(results.totalhits / results.count));
-      currentPage = Math.ceil(results.start / results.count);
+      currentPage = Math.ceil((results.start + 1) / results.count);
     }
 
     if (pages === 1) {
@@ -145,7 +145,7 @@ Y.extend(Search, Y.Base, {
 
     if (currentPage > 1) {
       queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: ((currentPage - 2) * results.count) + 1
+        start: ((currentPage - 2) * results.count)
       }));
 
       ul.append(
@@ -157,7 +157,7 @@ Y.extend(Search, Y.Base, {
 
     for (i = pagination.start; i <= pagination.end; ++i) {
       queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: ((i - 1) * results.count) + 1
+        start: ((i - 1) * results.count)
       }));
 
       li = Node.create('<li/>');
@@ -173,7 +173,7 @@ Y.extend(Search, Y.Base, {
 
     if (pagination.end > currentPage) {
       queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: (currentPage * results.count) + 1
+        start: (currentPage * results.count)
       }));
 
       ul.append(
@@ -189,7 +189,7 @@ Y.extend(Search, Y.Base, {
   renderResults: function (parent) {
     var parentNode = Y.one(parent),
         results    = this.get(RESULTS),
-        ol         = Node.create('<ol start="' + results.start + '"/>');
+        ol         = Node.create('<ol start="' + (results.start + 1) + '"/>');
 
     Y.Array.each(results.results, function (result) {
       ol.append(
@@ -212,7 +212,7 @@ Y.extend(Search, Y.Base, {
 
     config = Y.merge({
       count  : 10,
-      start  : 1
+      start  : 0
     }, config || {});
 
     facade = Y.merge(config, {query: query});
@@ -221,7 +221,7 @@ Y.extend(Search, Y.Base, {
       params.count = config.count;
     }
 
-    if (config.start !== 1) {
+    if (config.start !== 0) {
       params.start = config.start;
     }
 
@@ -262,7 +262,7 @@ Y.extend(Search, Y.Base, {
           var facade = Y.merge(facade, {response: response});
 
           try {
-            facade.data = Y.JSON.parse(response.responseText);
+            facade.data = Y.JSON.parse(response.responseText).web;
           } catch (ex) {
             facade.exception = ex;
             this.fire(EVT_SEARCH_FAILURE, facade);

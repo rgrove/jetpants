@@ -1,8 +1,11 @@
 class Jetpants; class Provider
-  autoload :BOSS, 'hydra/provider/boss'
+  autoload :BOSS, 'jetpants/hydra/provider/boss'
 
+  # Default HTTP headers to send with each request. This is used in
+  # DEFAULT_REQUEST_OPTIONS below.
   DEFAULT_HEADERS = {:'Accept-Encoding' => 'gzip,deflate'}
 
+  # Default Typhoeus request options for each request.
   DEFAULT_REQUEST_OPTIONS = {
     :follow_location => true,
     :headers         => DEFAULT_HEADERS,
@@ -13,18 +16,27 @@ class Jetpants; class Provider
 
   attr_reader :options, :request_options
 
+  # Initializes a new Provider with the specified Provider-specific options.
   def initialize(options = {})
     @options         = options
     @request_options = DEFAULT_REQUEST_OPTIONS
   end
 
+  # Receives a raw Typhoeus::Response object after a request has finished, and
+  # returns either +nil+ (indicating that there was no useful data in the
+  # response, or that the response was an error) or a Hash containing parsed
+  # data extracted from the response.
   def extract(response)
   end
 
+  # Returns the URL (as a String) that should be used to perform the request for
+  # this Provider instance.
   def url
   end
 
+  # Various utility methods for providers.
   module Utils
+
     # Builds a query string from a Hash. (Stolen from Rack)
     def build_query(params)
       params.map { |k, v|
@@ -52,5 +64,6 @@ class Jetpants; class Provider
       }
     end
     module_function :unescape
+
   end
 end; end

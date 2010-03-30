@@ -113,11 +113,11 @@ Jetpants.ATTRS = {
   },
 
   /**
-   * Result offset to use when requesting search results.
+   * 0-based result offset to use when requesting search results.
    *
    * @attribute resultStart
    * @type Number
-   * @default 1
+   * @default 0
    */
   resultStart: {
     setter: function (value) {
@@ -129,7 +129,7 @@ Jetpants.ATTRS = {
     },
 
     valueFn: function () {
-      return History.get('start') || 1;
+      return History.get('start') || 0;
     }
   },
 
@@ -257,7 +257,7 @@ Y.extend(Jetpants, Y.Base, {
 
       this.setAttrs({
         resultCount: newParsed.count || 10,
-        resultStart: newParsed.start || 1
+        resultStart: newParsed.start || 0
       });
 
       if (changed.q) {
