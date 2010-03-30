@@ -8,16 +8,23 @@ class Jetpants; class Hydra
     @providers = providers
   end
 
+  def add(providers = {})
+    @providers.merge!(providers)
+  end
+
   def run
     hydra    = Typhoeus::Hydra.new
     requests = {}
     results  = {}
 
     @providers.each do |name, provider|
-      request = requests[name] = Typhoeus::Request.new(provider.url,
-          provider.options)
+      # A nil url means this provider doesn't want to issue a request.
+      next unless url = provider.url
 
-      request.on_complete {|response| provider.extract(response) }
+      request = requests[name] = Typhoeus::Request.new(url,
+          provider.request_options)
+
+      request.on_complete {|response| provider.extract(response) || {} }
       hydra.queue(request)
     end
 
