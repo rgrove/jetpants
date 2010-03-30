@@ -1,9 +1,7 @@
 class Jetpants::Provider::BOSS::Web < Jetpants::Provider::BOSS
   def initialize(options = {})
-    super(options)
-
-    # TODO: support :start and :count args
-    @options[:vertical] = :web
+    super(options.merge({:vertical => :web}))
+    @request_options[:timeout] = 1000
   end
 
   def extract(response)

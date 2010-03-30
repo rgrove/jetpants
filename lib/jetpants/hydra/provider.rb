@@ -1,14 +1,24 @@
+require 'yajl'
+
 class Jetpants; class Provider
-  autoload :BOSS, 'jetpants/hydra/provider/boss'
+  autoload :BOSS,    'jetpants/hydra/provider/boss'
+  autoload :Twitter, 'jetpants/hydra/provider/twitter'
 
   # Default HTTP headers to send with each request. This is used in
   # DEFAULT_REQUEST_OPTIONS below.
-  DEFAULT_HEADERS = {:'Accept-Encoding' => 'gzip,deflate'}
+  DEFAULT_HEADERS = {
+    :Accept            => 'application/json',
+    :'Accept-Charset'  => 'utf-8,ISO-8859-1;q=0.9,*;q=0.8',
+
+    # Typhoeus doesn't support gzip or deflate, even though libcurl does. Argh.
+    # TODO: fork Typhoeus and patch it to support CURLOPT_ENCODING
+    # :'Accept-Encoding' => 'gzip,deflate'
+  }
 
   # Default Typhoeus request options for each request.
   DEFAULT_REQUEST_OPTIONS = {
     :follow_location => true,
-    :headers         => DEFAULT_HEADERS,
+    :headers         => DEFAULT_HEADERS.dup,
     :max_redirects   => 2,
     :timeout         => 500,
     :user_agent      => ENV['JETPANTS_HYDRA_USER_AGENT'] || 'Jetpants-Hydra/1.0 (+http://jetpants.com)'
@@ -18,8 +28,10 @@ class Jetpants; class Provider
 
   # Initializes a new Provider with the specified Provider-specific options.
   def initialize(options = {})
-    @options         = options
-    @request_options = DEFAULT_REQUEST_OPTIONS
+    @options            = options
+    @options[:params] ||= {}
+
+    @request_options = DEFAULT_REQUEST_OPTIONS.dup
   end
 
   # Receives a raw Typhoeus::Response object after a request has finished, and
@@ -30,7 +42,8 @@ class Jetpants; class Provider
   end
 
   # Returns the URL (as a String) that should be used to perform the request for
-  # this Provider instance.
+  # this Provider instance. If +nil+ is returned, no request will be executed
+  # for this Provider.
   def url
   end
 
@@ -66,4 +79,6 @@ class Jetpants; class Provider
     module_function :unescape
 
   end
+
+  include Utils
 end; end

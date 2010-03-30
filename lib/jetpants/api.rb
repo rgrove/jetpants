@@ -35,13 +35,27 @@ class Jetpants::Api < Sinatra::Base
     end
 
     def search(query, count = 10, start = 0)
-      Jetpants::Hydra.new(
+      hydra = Jetpants::Hydra.new(
         :web => Jetpants::Provider::BOSS::Web.new(
           :query => query,
           :count => count,
           :start => start
         )
-      ).run
+      )
+
+      # Only request Twitter results for the first page.
+      if start < count
+        hydra.add(
+          :twitter => Jetpants::Provider::Twitter.new(
+            :query  => query,
+            :params => {
+              :rpp => 5
+            }
+          )
+        )
+      end
+
+      hydra.run
     end
   end
 
