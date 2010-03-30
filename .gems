@@ -1,4 +1,5 @@
 bossman --version 0.4.1
 erubis --version 2.6.5
 sinatra --version 1.0.0
+typhoeus --version 0.1.23
 yajl-ruby --version 0.7.5
