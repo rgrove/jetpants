@@ -50,6 +50,19 @@ class Jetpants; class Provider
   # Various utility methods for providers.
   module Utils
 
+    # Return the bytesize of String; uses String#length under Ruby 1.8 and
+    # String#bytesize under 1.9. (Stolen from Rack)
+    if ''.respond_to?(:bytesize)
+      def bytesize(string)
+        string.bytesize
+      end
+    else
+      def bytesize(string)
+        string.size
+      end
+    end
+    module_function :bytesize
+
     # Builds a query string from a Hash. (Stolen from Rack)
     def build_query(params)
       params.map { |k, v|
