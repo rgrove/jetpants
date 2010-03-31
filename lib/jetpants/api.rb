@@ -44,16 +44,16 @@ class Jetpants::Api < Sinatra::Base
       )
 
       # Only request Twitter results for the first page.
-      if start < count
-        hydra.add(
-          :twitter => Jetpants::Provider::Twitter.new(
-            :query  => query,
-            :params => {
-              :rpp => 5
-            }
-          )
-        )
-      end
+      # if start < count
+      #   hydra.add(
+      #     :twitter => Jetpants::Provider::Twitter.new(
+      #       :query  => query,
+      #       :params => {
+      #         :rpp => 5
+      #       }
+      #     )
+      #   )
+      # end
 
       hydra.run
     end
