@@ -19,8 +19,8 @@ body {
 }
 
 #doc { min-width: 600px; }
-.entry #doc { max-width: none; }
-.loading #doc { display: none; }
+#doc.entry { max-width: none; }
+#doc.loading { display: none; }
 
 /* -- Header ---------------------------------------------------------------- */
 #hd {

@@ -2,31 +2,51 @@
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: false, onevar: true, plusplus: false, white: false */
 
 /**
- * Jetpants search module.
+ * Jetpants Search module.
  *
  * @module jetpants-search
  * @namespace Jetpants
  */
 YUI.add('jetpants-search', function (Y) {
 
-// -- Constructor --------------------------------------------------------------
-
 /**
  * @class Search
+ * @static
  */
 function Search(config) {
   Search.superclass.constructor.apply(this, arguments);
 }
 
 // -- Shorthand ----------------------------------------------------------------
-var doc  = Y.config.doc,
-    Lang = Y.Lang,
-    Node = Y.Node,
+var doc       = Y.config.doc,
+    win       = Y.config.win,
+    Array     = Y.Array,
+    Attribute = Y.Attribute,
+    DOM       = Y.DOM,
+    History   = Y.HistoryLite,
+    Lang      = Y.Lang,
+    Node      = Y.Node,
 
-QUERY   = 'query',
-RESULTS = 'results',
+API_URL       = 'apiUrl',
+CONTENT_BOX   = 'contentBox',
+PENDING_QUERY = 'pendingQuery',
+QUERY         = 'query',
+QUERY_NODES   = 'queryNodes',
+RESULT_COUNT  = 'resultCount',
+RESULT_START  = 'resultStart',
+RESULTS       = 'results',
+SEARCH_FORMS  = 'searchForms',
+
+// -- Selectors ----------------------------------------------------------------
+SELECTOR_SEARCH_FORM  = 'form.sf',
+SELECTOR_SEARCH_QUERY = SELECTOR_SEARCH_FORM + ' input.q',
 
 // -- Public Events ------------------------------------------------------------
+
+/**
+ * @event search
+ */
+EVT_SEARCH = 'search',
 
 /**
  * @event searchEnd
@@ -37,11 +57,6 @@ EVT_SEARCH_END = 'searchEnd',
  * @event searchFailure
  */
 EVT_SEARCH_FAILURE = 'searchFailure',
-
-/**
- * @event searchStart
- */
-EVT_SEARCH_START = 'searchStart',
 
 /**
  * @event searchSuccess
@@ -60,13 +75,91 @@ Search.ATTRS = {
   apiUrl: {value: '/api/search'},
 
   /**
-   * Query from the most recent search request, if any.
+   * Current query in the search box, which may or may not have been submitted
+   * yet (thus "pending").
+   *
+   * @attribute pendingQuery
+   * @type String
+   */
+  pendingQuery: {
+    setter: function (value) {
+      return Lang.trim(value) || '';
+    },
+
+    valueFn: function () {
+      return this.get(CONTENT_BOX).one(SELECTOR_SEARCH_QUERY).get('value');
+    }
+  },
+
+  /**
+   * Currently active search query from the page URL, or <code>null</code> if
+   * there isn't one.
    *
    * @attribute query
-   * @type String
+   * @type String|null
+   */
+  query: {
+    readOnly: true,
+    valueFn : function () {
+      return Lang.trim(History.get('q')) || null;
+    }
+  },
+
+  /**
+   * NodeList containing all search input boxes on the page.
+   *
+   * @attribute queryNodes
+   * @type NodeList
    * @final
    */
-  query: {readOnly: true},
+  queryNodes: {
+    readOnly: true,
+    valueFn : function () {
+      return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_QUERY);
+    }
+  },
+
+  /**
+   * Number of web results to return for a search.
+   *
+   * @attribute resultCount
+   * @type Number
+   * @default 10
+   */
+  resultCount: {
+    setter: function (value) {
+      value = parseInt(value, 10);
+
+      if (isNaN(value) || value < 1 || value > 100) {
+        return Attribute.INVALID_VALUE;
+      }
+    },
+
+    valueFn: function () {
+      return +(History.get('count') || 10);
+    }
+  },
+
+  /**
+   * 0-based result offset to use when requesting search results.
+   *
+   * @attribute resultStart
+   * @type Number
+   * @default 0
+   */
+  resultStart: {
+    setter: function (value) {
+      value = parseInt(value, 10);
+
+      if (isNaN(value) || value < 0 || value > 999) {
+        return Attribute.INVALID_VALUE;
+      }
+    },
+
+    valueFn: function () {
+      return +(History.get('start') || 0);
+    }
+  },
 
   /**
    * Results of the most recent search request, if any.
@@ -78,55 +171,145 @@ Search.ATTRS = {
   results: {
     readOnly: true,
     value   : {}
+  },
+
+  /**
+   * NodeList containing all search forms on the page.
+   *
+   * @attribute searchForms
+   * @type NodeList
+   * @final
+   */
+  searchForms: {
+    readOnly: true,
+    valueFn : function () {
+      return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_FORM);
+    }
   }
 };
 
-Y.extend(Search, Y.Base, {
-  // -- Public Instance Methods ------------------------------------------------
-  // initializer: function (config) {},
-  // destructor: function () {},
+Y.extend(Search, Y.Widget, {
 
-  encodeEntities: function (string) {
+  // -- Public Instance Methods ------------------------------------------------
+  initializer: function (config) {
+    this.publish(EVT_SEARCH,         {defaultFn: this._defSearchFn});
+    this.publish(EVT_SEARCH_FAILURE, {defaultFn: this._defSearchFailureFn});
+    this.publish(EVT_SEARCH_SUCCESS, {defaultFn: this._defSearchSuccessFn});
+
+    Y.on('history-lite:change', this._onHistoryChange, this);
+  },
+
+  // destructor: function () {
+  // },
+
+  bindUI: function () {
+    this.after('queryChange', this._afterQueryChange);
+
+    this.get(SEARCH_FORMS).on('submit', this._onSubmit, this);
+    this.get(QUERY_NODES).after('input', this._afterQueryInput, this);
+  },
+
+  renderUI: function () {
+    var agents     = ['chrome', 'gecko', 'ie', 'mobile', 'opera', 'webkit'],
+        autoFocus  = true,
+        query      = this.get(QUERY),
+        root       = Y.one(doc.documentElement),
+        UA         = Y.UA;
+
+    // Assign useragent-specific classnames to the root element for use in CSS.
+    Array.each(agents, function (agent) {
+      if (UA[agent]) {
+        root.addClass(agent);
+      }
+    }, this);
+
+    if (UA.os) {
+      root.addClass(UA.os);
+    }
+
+    // If the URL contains a search query, remove the .entry class from the
+    // document element to indicate that this is now a SRP rather than an entry
+    // page and fire a search event.
+    if (query) {
+      autoFocus = false;
+      root.removeClass('entry');
+      this.fire(EVT_SEARCH, {query: query});
+    }
+
+    // Remove the .loading class from the contentBox now that we're done
+    // rendering the initial page state.
+    this.get(CONTENT_BOX).removeClass('loading');
+
+    if (autoFocus) {
+      this.get(QUERY_NODES).item(0).focus();
+    }
+  },
+
+  syncUI: function () {
+    this.get(QUERY_NODES).set('value', this.get('query') || '');
+  },
+
+  // -- Protected Methods ------------------------------------------------------
+
+  // TODO: use YUI for this?
+  _buildQueryString: function (params) {
+    var _params = [],
+        encode  = encodeURIComponent;
+
+    Y.each(params, function (value, name) {
+        _params.push(encode(name) + '=' + encode(value));
+    });
+
+    return _params.join('&');
+  },
+
+  _encodeEntities: function (string) {
     var div = doc.createElement('div');
     div.appendChild(doc.createTextNode(string));
     return div.innerHTML;
   },
 
-  formatNumber: function (number) {
+  _formatNumber: function (number) {
     return Y.DataType.Number.format(number, {
       thousandsSeparator: ','
     });
   },
 
-  renderInfo: function (parent) {
+  _renderInfo: function (parent) {
     var parentNode = Y.one(parent),
         results    = this.get(RESULTS);
 
     parentNode.get('children').remove();
-    parentNode.append(
-      '<p>' +
-        'Results <strong>' + (results.start + 1) + ' - ' + (results.start + results.count) + '</strong> ' +
-        'of about <strong>' + this.formatNumber(results.deephits) + '</strong> for ' +
-        '<strong>' + this.encodeEntities(this.get(QUERY)) + '</strong>' +
-      '</p>'
-    );
+
+    if (results.count) {
+      parentNode.append(
+        '<p>' +
+          'Results <strong>' + (results.start + 1) + ' - ' + (results.start + results.count) + '</strong> ' +
+          'of about <strong>' + this._formatNumber(results.deephits) + '</strong> for ' +
+          '<strong>' + this._encodeEntities(this.get(QUERY)) + '</strong>' +
+        '</p>'
+      );
+    } else {
+      parentNode.append('<p>No results found.</p>');
+    }
   },
 
-  renderPagination: function (parent) {
-    var parentNode = Y.one(parent),
-        results    = this.get(RESULTS),
+  _renderPagination: function (parent) {
+    // TODO: refactor this into a generic pagination widget.
+    var count      = this.get(RESULT_COUNT),
         pagination = {},
+        parentNode = Y.one(parent),
         query      = this.get(QUERY),
+        results    = this.get(RESULTS),
+        start      = this.get(RESULT_START),
         currentPage, i, li, pages, queryParams, queryString, ul;
-
-    parentNode.get('children').remove();
 
     if (results.totalhits === 0) {
       currentPage = 1;
       pages       = 1;
     } else {
-      pages       = Math.min(100, Math.ceil(results.totalhits / results.count));
-      currentPage = Math.ceil((results.start + 1) / results.count);
+      pages       = Math.min(100, Math.ceil(results.totalhits / count));
+      currentPage = Math.ceil((start + 1) / count);
     }
 
     if (pages === 1) {
@@ -138,14 +321,14 @@ Y.extend(Search, Y.Base, {
 
     queryParams = {
       q    : query,
-      count: results.count
+      count: count
     };
 
     ul = Node.create('<ul role="navigation"/>');
 
     if (currentPage > 1) {
       queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: ((currentPage - 2) * results.count)
+        start: ((currentPage - 2) * count)
       }));
 
       ul.append(
@@ -157,7 +340,7 @@ Y.extend(Search, Y.Base, {
 
     for (i = pagination.start; i <= pagination.end; ++i) {
       queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: ((i - 1) * results.count)
+        start: ((i - 1) * count)
       }));
 
       li = Node.create('<li/>');
@@ -173,7 +356,7 @@ Y.extend(Search, Y.Base, {
 
     if (pagination.end > currentPage) {
       queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: (currentPage * results.count)
+        start: (currentPage * count)
       }));
 
       ul.append(
@@ -183,64 +366,75 @@ Y.extend(Search, Y.Base, {
       );
     }
 
+    parentNode.get('children').remove();
     parentNode.append(ul);
   },
 
-  renderResults: function (parent) {
+  _renderWebResults: function (parent) {
     var parentNode = Y.one(parent),
         results    = this.get(RESULTS),
-        ol         = Node.create('<ol start="' + (results.start + 1) + '"/>');
-
-    Y.Array.each(results.results, function (result) {
-      ol.append(
-        '<li>' +
-          '<h3 class="title"><a href="' + result.url + '">' + result.title + '</a></h3>' +
-          '<div class="abstract">' + result['abstract'] + '</div>' +
-          '<cite>' + result.dispurl + '</cite>' +
-        '</li>'
-      );
-    }, this);
+        ol;
 
     parentNode.get('children').remove();
-    parentNode.append(ol);
+
+    if (results.results && results.count) {
+      ol = Node.create('<ol start="' + (results.start + 1) + '"/>');
+
+      Array.each(results.results, function (result) {
+        ol.append(
+          '<li>' +
+            '<h3 class="title"><a href="' + result.url + '">' + result.title + '</a></h3>' +
+            '<div class="abstract">' + result['abstract'] + '</div>' +
+            '<cite>' + result.dispurl + '</cite>' +
+          '</li>'
+        );
+      }, this);
+
+      parentNode.append(ol);
+    } else {
+      parentNode.append(
+        '<h3>Aw snap!</h3>' +
+        '<p>' +
+          "We scoured the vast wastelands of the Intertubes for " +
+          "<strong>" + this._encodeEntities(this.get(QUERY)) + "</strong>, " +
+          "but we couldn't find anything. Sorry." +
+        '</p>'
+      );
+    }
   },
 
-  search: function (query, config) {
-    var params = {q: query},
-        url    = this.get('apiUrl'),
+  _search: function () {
+    var config = this.getAttrs([QUERY, RESULT_COUNT, RESULT_START]),
+        params = {q: config[QUERY]},
         facade;
 
-    config = Y.merge({
-      count  : 10,
-      start  : 0
-    }, config || {});
-
-    facade = Y.merge(config, {query: query});
-
-    if (config.count !== 10) {
-      params.count = config.count;
+    // Only include the count and start params if they're set to values other
+    // than the defaults.
+    if (config.resultCount !== 10) {
+      params.count = config.resultCount;
     }
 
-    if (config.start !== 0) {
-      params.start = config.start;
+    if (config.resultStart !== 0) {
+      params.start = config.resultStart;
     }
 
+    // Abort any pending requests.
     if (this._request && this._request.isInProgress()) {
       this._request.abort();
     }
 
-    this._request = Y.io(url, {
+    this._request = Y.io(this.get(API_URL), {
       context: this,
       data   : this._buildQueryString(params),
       timeout: 15000,
 
       on: {
         end: function () {
-          this.fire(EVT_SEARCH_END, facade);
+          this.fire(EVT_SEARCH_END, config);
         },
 
         failure: function (id, response) {
-          var facade = Y.merge(facade, {response: response});
+          var facade = Y.merge(config, {response: response});
 
           try {
             facade.data = Y.JSON.parse(response.responseText);
@@ -251,50 +445,130 @@ Y.extend(Search, Y.Base, {
           this.fire(EVT_SEARCH_FAILURE, facade);
         },
 
-        start: function () {
-          this._set(QUERY, query);
-          this._set(RESULTS, {});
-
-          this.fire(EVT_SEARCH_START, facade);
-        },
-
         success: function (id, response) {
-          var facade = Y.merge(facade, {response: response});
+          var facade = Y.merge(config, {response: response});
 
           try {
-            facade.data = Y.JSON.parse(response.responseText).web;
+            facade.results = Y.JSON.parse(response.responseText).web;
           } catch (ex) {
             facade.exception = ex;
             this.fire(EVT_SEARCH_FAILURE, facade);
             return;
           }
 
-          this._set(RESULTS, facade.data);
+          this._set(RESULTS, facade.results);
           this.fire(EVT_SEARCH_SUCCESS, facade);
         }
       }
     });
   },
 
-  // -- Protected Methods ------------------------------------------------------
-  _buildQueryString: function (params) {
-    var _params = [],
-        encode  = encodeURIComponent;
-
-    Y.each(params, function (value, name) {
-        _params.push(encode(name) + '=' + encode(value));
-    });
-
-    return _params.join('&');
-  }
-
   // -- Protected Event Handlers -----------------------------------------------
+
+  /**
+   * @method _afterQueryChange
+   * @protected
+   */
+  _afterQueryChange: function (e) {
+    var query = e.newVal,
+        root  = Y.one(doc.documentElement);
+
+    this.set(PENDING_QUERY, query || '');
+    this.syncUI();
+
+    if (query) {
+    } else {
+      root.addClass('entry');
+      doc.title = 'Jetpants Search';
+    }
+  },
+
+  /**
+   * @method _afterQueryInput
+   *
+   */
+  _afterQueryInput: function (e) {
+    this.set(PENDING_QUERY, e.currentTarget.get('value'));
+  },
+
+  /**
+   * @method _onHistoryChange
+   * @protected
+   */
+  _onHistoryChange: function (e) {
+    var changed   = e.changed,
+        newParsed = e.newParsed,
+        removed   = e.removed;
+
+    if (changed.q || changed.count || changed.start ||
+        removed.q || removed.count || removed.start) {
+
+      // TODO: Debug _setAttrs(). Why doesn't it work?
+      this._set(QUERY, newParsed.q || null);
+      this.set(RESULT_COUNT, +newParsed.count || 10);
+      this.set(RESULT_START, +newParsed.start || 0);
+
+      if (!removed.q) {
+        this.fire(EVT_SEARCH, {query: newParsed.q});
+      }
+    }
+  },
+
+  /**
+   * Handles search form submission.
+   *
+   * @method _onSubmit
+   * @protected
+   */
+  _onSubmit: function (e) {
+    e.preventDefault();
+    History.add({q: this.get(PENDING_QUERY)});
+  },
+
+  // -- Private Event Handlers -------------------------------------------------
+
+  /**
+   * @method _defSearchFn
+   * @private
+   */
+  _defSearchFn: function (e) {
+    this._set(RESULTS, {});
+    this._search();
+
+    DOM.removeClass(doc.documentElement, 'entry');
+    doc.title = e.query + ' - Jetpants Search';
+  },
+
+  /**
+   * @method _defSearchFailureFn
+   * @private
+   */
+  _defSearchFailureFn: function (e) {
+  },
+
+  /**
+   * @method _defSearchSuccessFn
+   * @private
+   */
+  _defSearchSuccessFn: function (e) {
+    this._renderInfo('#bd .info');
+    this._renderWebResults('#results .web');
+    this._renderPagination('#bd .pg');
+
+    win.scroll(0, 0);
+
+    Y.one('#results .web a').focus();
+  }
 });
 
 Y.namespace('Jetpants').Search = Search;
 
+// TODO: need to file a bug to get this added to YUI.
+Y.Node.DOM_EVENTS.input = 1;
+
 }, '1.0.0', {
     requires: [
-      'base', 'datatype-number', 'io-base', 'json-parse', 'node'
+      'datatype-number', 'event', 'event-custom', 'gallery-history-lite',
+      'io-base', 'json-parse', 'node', 'widget'
     ]
 });
