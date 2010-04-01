@@ -1,5 +1,7 @@
 require 'erubis'
 require 'sinatra/base'
+require 'yajl'
+require 'yaml'
 
 class Jetpants::Web < Sinatra::Base
   set :root, Jetpants::ROOT_DIR
@@ -14,12 +16,19 @@ class Jetpants::Web < Sinatra::Base
     content_type('text/html', :charset => 'utf-8')
     cache_control(:public, :max_age => 1800)
 
-    erubis(:index)
+    erubis(:index, :locals => {:templates => json_templates(:index)})
   end
 
   not_found do
     @q = unescape(request.path.gsub('/', ' ').strip)
     erubis(:'error/404')
+  end
+
+  helpers do
+    # TODO: cache json templates when not in dev mode
+    def json_templates(name)
+      Yajl::Encoder.encode(YAML.load_file("#{settings.views}/#{name}.yaml"))
+    end
   end
 
 end

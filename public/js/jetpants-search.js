@@ -1,5 +1,5 @@
 /*global YUI */
-/*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: false, onevar: true, plusplus: false, white: false */
+/*jslint bitwise: true, browser: true, eqeqeq: true, laxbreak: true, newcap: true, nomen: false, onevar: true, plusplus: false, white: false */
 
 /**
  * Jetpants Search module.
@@ -27,6 +27,7 @@ var doc       = Y.config.doc,
     Lang      = Y.Lang,
     Node      = Y.Node,
 
+// Attribute names.
 API_URL       = 'apiUrl',
 CONTENT_BOX   = 'contentBox',
 PENDING_QUERY = 'pendingQuery',
@@ -36,8 +37,9 @@ RESULT_COUNT  = 'resultCount',
 RESULT_START  = 'resultStart',
 RESULTS       = 'results',
 SEARCH_FORMS  = 'searchForms',
+TEMPLATES     = 'templates',
 
-// -- Selectors ----------------------------------------------------------------
+// Selectors.
 SELECTOR_SEARCH_FORM  = 'form.sf',
 SELECTOR_SEARCH_QUERY = SELECTOR_SEARCH_FORM + ' input.q',
 
@@ -185,6 +187,29 @@ Search.ATTRS = {
     valueFn : function () {
       return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_FORM);
     }
+  },
+
+  /**
+   * JSON templates.
+   *
+   * @attribute templates
+   * @type Object
+   */
+  templates: {
+    getter: function (templates) {
+      // Compile templates on first use.
+      Y.Object.each(templates, function (template, name) {
+        templates[name] = jsontemplate.Template(template);
+      }, this);
+
+      // Remove this getter to ensure that compilation only occurs once.
+      this.modifyAttr(TEMPLATES, {getter: null});
+
+      return templates;
+    },
+
+    writeOnce: true,
+    value: {}
   }
 };
 
@@ -277,130 +302,101 @@ Y.extend(Search, Y.Widget, {
 
   _renderInfo: function (parent) {
     var parentNode = Y.one(parent),
-        results    = this.get(RESULTS);
+        results    = this.get(RESULTS),
+        template   = this.get(TEMPLATES + '.resultInfo');
 
     parentNode.get('children').remove();
 
-    if (results.count) {
-      parentNode.append(
-        '<p>' +
-          'Results <strong>' + (results.start + 1) + ' - ' + (results.start + results.count) + '</strong> ' +
-          'of about <strong>' + this._formatNumber(results.deephits) + '</strong> for ' +
-          '<strong>' + this._encodeEntities(this.get(QUERY)) + '</strong>' +
-        '</p>'
-      );
-    } else {
-      parentNode.append('<p>No results found.</p>');
-    }
+    parentNode.append(template.expand({
+      info: !results.count ? false : {
+        first: results.start + 1,
+        last : results.start + results.count,
+        total: this._formatNumber(results.deephits),
+        query: this._encodeEntities(this.get(QUERY))
+      }
+    }));
   },
 
   _renderPagination: function (parent) {
-    // TODO: refactor this into a generic pagination widget.
-    var count      = this.get(RESULT_COUNT),
-        pagination = {},
-        parentNode = Y.one(parent),
-        query      = this.get(QUERY),
-        results    = this.get(RESULTS),
-        start      = this.get(RESULT_START),
-        currentPage, i, li, pages, queryParams, queryString, ul;
+    var currentPage = 1,
+        i,
+        pagination,
+        parentNode  = Y.one(parent),
+        pages       = [],
+        queryParams,
+        results     = this.get(RESULTS),
+        resultCount = this.get(RESULT_COUNT),
+        resultStart = this.get(RESULT_START),
+        template    = this.get(TEMPLATES + '.resultPagination'),
+        that        = this,
+        totalPages  = 1,
+        windowEnd,
+        windowStart;
 
-    if (results.totalhits === 0) {
-      currentPage = 1;
-      pages       = 1;
-    } else {
-      pages       = Math.min(100, Math.ceil(results.totalhits / count));
-      currentPage = Math.ceil((start + 1) / count);
+    if (results.totalhits) {
+      totalPages  = Math.min(100, Math.ceil(results.totalhits / resultCount));
+      currentPage = Math.ceil((resultStart + 1) / resultCount);
     }
 
-    if (pages === 1) {
+    if (totalPages === 1) {
       return;
     }
 
-    pagination.start = Math.max(1, currentPage - 5);
-    pagination.end   = Math.min(pagination.start + 9, pages);
-
     queryParams = {
-      q    : query,
-      count: count
+      q    : this.get(QUERY),
+      count: resultCount
     };
 
-    ul = Node.create('<ul role="navigation"/>');
+    windowStart = Math.max(1, currentPage - 5);
+    windowEnd   = Math.min(windowStart + 9, totalPages);
 
-    if (currentPage > 1) {
-      queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: ((currentPage - 2) * count)
-      }));
-
-      ul.append(
-        '<li class="prev">' +
-          '<a href="#' + queryString + '" rel="prev">Prev</a>' +
-        '</li>'
-      );
+    for (i = windowStart; i <= windowEnd; ++i) {
+      pages.push({
+        current    : i === currentPage,
+        page       : i,
+        queryString: this._buildQueryString(Y.merge(queryParams, {
+          start: (i - 1) * resultCount
+        }))
+      });
     }
 
-    for (i = pagination.start; i <= pagination.end; ++i) {
-      queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: ((i - 1) * count)
-      }));
+    pagination = {
+      next: (function () {
+        if (windowEnd > currentPage) {
+          return {
+            queryString: that._buildQueryString(Y.merge(queryParams, {
+              start: currentPage * resultCount
+            }))
+          };
+        }
+      }()),
 
-      li = Node.create('<li/>');
+      pages: pages,
 
-      if (i === currentPage) {
-        li.append('<strong>' + i + '</strong>');
-      } else {
-        li.append('<a href="#' + queryString + '">' + i + '</a>');
-      }
-
-      ul.append(li);
-    }
-
-    if (pagination.end > currentPage) {
-      queryString = this._buildQueryString(Y.merge(queryParams, {
-        start: (currentPage * count)
-      }));
-
-      ul.append(
-        '<li class="next">' +
-          '<a href="#' + queryString + '" rel="next">Next</a>' +
-        '</li>'
-      );
-    }
+      prev: (function () {
+        if (currentPage > 1) {
+          return {
+            queryString: that._buildQueryString(Y.merge(queryParams, {
+              start: ((currentPage - 2) * resultCount)
+            }))
+          };
+        }
+      }())
+    };
 
     parentNode.get('children').remove();
-    parentNode.append(ul);
+    parentNode.append(template.expand(pagination));
   },
 
   _renderWebResults: function (parent) {
     var parentNode = Y.one(parent),
         results    = this.get(RESULTS),
-        ol;
+        template   = this.get(TEMPLATES + '.results');
+
+    results.query = this.get(QUERY);
 
     parentNode.get('children').remove();
-
-    if (results.results && results.count) {
-      ol = Node.create('<ol start="' + (results.start + 1) + '"/>');
-
-      Array.each(results.results, function (result) {
-        ol.append(
-          '<li>' +
-            '<h3 class="title"><a href="' + result.url + '">' + result.title + '</a></h3>' +
-            '<div class="abstract">' + result['abstract'] + '</div>' +
-            '<cite>' + result.dispurl + '</cite>' +
-          '</li>'
-        );
-      }, this);
-
-      parentNode.append(ol);
-    } else {
-      parentNode.append(
-        '<h3>Aw snap!</h3>' +
-        '<p>' +
-          "We scoured the vast wastelands of the Intertubes for " +
-          "<strong>" + this._encodeEntities(this.get(QUERY)) + "</strong>, " +
-          "but we couldn't find anything. Sorry." +
-        '</p>'
-      );
-    }
+    parentNode.append(template.expand(results));
   },
 
   _search: function () {
@@ -551,13 +547,21 @@ Y.extend(Search, Y.Widget, {
    * @private
    */
   _defSearchSuccessFn: function (e) {
+    var firstLink;
+
     this._renderInfo('#bd .info');
     this._renderWebResults('#results .web');
     this._renderPagination('#bd .pg');
 
     win.scroll(0, 0);
 
-    Y.one('#results .web a').focus();
+    firstLink = Y.one('#results .web a');
+
+    if (firstLink) {
+      firstLink.focus();
+    } else {
+      this.get(QUERY_NODES).item(0).focus().select();
+    }
   }
 });
 
@@ -569,6 +573,7 @@ Y.Node.DOM_EVENTS.input = 1;
 }, '1.0.0', {
     requires: [
       'datatype-number', 'event', 'event-custom', 'gallery-history-lite',
-      'io-base', 'json-parse', 'node', 'widget'
+      'io-base', 'json-parse', 'node', 'substitute', 'widget'
     ]
 });
+
