@@ -333,6 +333,8 @@ Y.extend(Search, Y.Widget, {
         windowEnd,
         windowStart;
 
+    parentNode.get('children').remove();
+
     if (results.totalhits) {
       totalPages  = Math.min(100, Math.ceil(results.totalhits / resultCount));
       currentPage = Math.ceil((resultStart + 1) / resultCount);
@@ -384,7 +386,6 @@ Y.extend(Search, Y.Widget, {
       }())
     };
 
-    parentNode.get('children').remove();
     parentNode.append(template.expand(pagination));
   },
 
