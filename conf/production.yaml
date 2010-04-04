@@ -1,0 +1,6 @@
+---
+# -- Static resources ----------------------------------------------------------
+resources:
+  jetpants-search:
+    css: /weld/jetpants-search.css
+    js: /weld/jetpants-search.js

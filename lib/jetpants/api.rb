@@ -1,11 +1,6 @@
-require 'sinatra/base'
-require 'yajl'
-
 require 'jetpants/hydra'
 
-class Jetpants::Api < Sinatra::Base
-  set :root, Jetpants::ROOT_DIR
-
+class Jetpants::Api < Jetpants::Base
   ERROR_MISSING_QUERY = 'No search query specified.'
 
   get '/search' do
@@ -21,11 +16,6 @@ class Jetpants::Api < Sinatra::Base
     start = (params[:start] || 0).to_i
 
     Yajl::Encoder.encode(search(query, count, start))
-  end
-
-  not_found do
-    @q = unescape(request.path.gsub('/', ' ').strip)
-    erubis(:'error/404')
   end
 
   helpers do

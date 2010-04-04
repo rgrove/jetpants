@@ -3,7 +3,7 @@ resultInfo: >
   {.section info}
     <p>
     Results <strong>{first} - {last}</strong> of about <strong>{total}</strong>
-    for <strong>{query}</strong>
+    for <strong>{query|html}</strong>
     </p>
   {.or}
     <p>No results found.</p>

@@ -1,13 +1,7 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
-class Jetpants
-  ROOT_DIR = ENV['JETPANTS_ROOT'] || File.dirname(File.expand_path(__FILE__))
-end
-
 require 'rubygems'
 require 'jetpants'
-require 'jetpants/api'
-require 'jetpants/web'
 
 map '/' do
   run Jetpants::Web
@@ -15,4 +9,15 @@ end
 
 map '/api' do
   run Jetpants::Api
+end
+
+unless ENV['RACK_ENV'] == 'production'
+  $LOAD_PATH.unshift('../weld/lib')
+  require 'weld'
+
+  Weld::Server.set(:config_file, File.join(Jetpants::CONFIG_DIR, 'weld.yaml'))
+
+  map '/weld' do
+    run Weld::Server
+  end
 end

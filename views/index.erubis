@@ -3,19 +3,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <title>Jetpants Search</title>
-  <link rel="stylesheet" type="text/css" href="/css/jetpants-core.css">
-  <script src="/js/json-template.js"></script>
-  <script src="http://yui.yahooapis.com/combo?3.1.0/build/yui/yui-min.js&amp;3.1.0/build/loader/loader-min.js"></script>
-  <script src="/js/history-lite.js"></script>
-  <script src="/js/jetpants-search.js"></script>
-  <script>
-    Y = YUI().use('jetpants-search', function () {
-      (new Y.Jetpants.Search({
-        contentBox: '#doc',
-        templates: <%= templates %>
-      })).render();
-    });
-  </script>
+  <link rel="stylesheet" type="text/css" href="<%== @config['resources']['jetpants-search']['css'] %>">
 </head>
 <body role="document">
 
@@ -39,6 +27,16 @@
     <%= erubis(:'partial/copyright') %>
   </div>
 </div>
+
+<script src="<%== @config['resources']['jetpants-search']['js'] %>"></script>
+<script>
+  var Y = YUI({fetchCSS:false, bootstrap: false}).use('jetpants-search', function (Y) {
+    (new Y.Jetpants.Search({
+      contentBox: '#doc',
+      templates: <%= @templates %>
+    })).render();
+  });
+</script>
 
 </body>
 </html>

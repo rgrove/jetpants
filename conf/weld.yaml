@@ -1,0 +1,69 @@
+---
+compressors:
+  css:
+    name: yui
+    options:
+      jar: /Users/rgrove/Library/Java/Extensions/yuicompressor.jar
+
+  js:
+    name: yui
+    options:
+      jar: /Users/rgrove/Library/Java/Extensions/yuicompressor.jar
+
+sourcePaths:
+  - ../public/js
+  - ../public/css
+
+components:
+
+  # -- Third-party dependencies ------------------------------------------------
+  json-template:
+    js:
+      - ext/json-template.js
+
+  yui-3.1.0-core:
+    js:
+      - 'http://yui.yahooapis.com/3.1.0/build/yui/yui-base.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/oop/oop.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/yui/yui-later.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/yui/yui-log.js'
+      # - 'http://yui.yahooapis.com/3.1.0/build/yui/get.js'
+      # - 'http://yui.yahooapis.com/3.1.0/build/loader/loader.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/event/event.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/event-custom/event-custom.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/dom/dom.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/node/node.js'
+
+  yui-3.1.0-base:
+    js:
+      - 'http://yui.yahooapis.com/3.1.0/build/attribute/attribute.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/pluginhost/pluginhost.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/base/base.js'
+
+  yui-3.1.0-widget:
+    css:
+      - 'http://yui.yahooapis.com/3.1.0/build/widget/assets/skins/sam/widget.css'
+
+    js:
+      - 'http://yui.yahooapis.com/3.1.0/build/yui/intl-base.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/intl/intl.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/classnamemanager/classnamemanager.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/widget/widget.js'
+
+  # -- Jetpants ----------------------------------------------------------------
+  jetpants-search:
+    requires:
+      - json-template
+      - yui-3.1.0-core
+      - yui-3.1.0-base
+      - yui-3.1.0-widget
+
+    css:
+      - jetpants-search.css
+
+    js:
+      - 'http://yui.yahooapis.com/3.1.0/build/datatype/datatype-number.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/io/io-base.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/json/json-parse.js'
+      - history-lite.js
+      - jetpants-search.js

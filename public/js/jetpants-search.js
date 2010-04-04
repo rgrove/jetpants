@@ -40,8 +40,12 @@ SEARCH_FORMS  = 'searchForms',
 TEMPLATES     = 'templates',
 
 // Selectors.
-SELECTOR_SEARCH_FORM  = 'form.sf',
-SELECTOR_SEARCH_QUERY = SELECTOR_SEARCH_FORM + ' input.q',
+SELECTOR_FIRST_WEB_RESULT = '#results .web a',
+SELECTOR_INFO             = '#bd .info',
+SELECTOR_PAGINATION       = '#bd .pg',
+SELECTOR_SEARCH_FORM      = 'form.sf',
+SELECTOR_SEARCH_QUERY     = SELECTOR_SEARCH_FORM + ' input.q',
+SELECTOR_WEB_RESULTS      = '#results .web',
 
 // -- Public Events ------------------------------------------------------------
 
@@ -221,7 +225,7 @@ Y.extend(Search, Y.Widget, {
     this.publish(EVT_SEARCH_FAILURE, {defaultFn: this._defSearchFailureFn});
     this.publish(EVT_SEARCH_SUCCESS, {defaultFn: this._defSearchSuccessFn});
 
-    Y.on('history-lite:change', this._onHistoryChange, this);
+    Y.after('history-lite:change', this._afterHistoryChange, this);
   },
 
   // destructor: function () {
@@ -271,7 +275,7 @@ Y.extend(Search, Y.Widget, {
   },
 
   syncUI: function () {
-    this.get(QUERY_NODES).set('value', this.get('query') || '');
+    this.get(QUERY_NODES).set('value', this.get(QUERY) || '');
   },
 
   // -- Protected Methods ------------------------------------------------------
@@ -286,12 +290,6 @@ Y.extend(Search, Y.Widget, {
     });
 
     return _params.join('&');
-  },
-
-  _encodeEntities: function (string) {
-    var div = doc.createElement('div');
-    div.appendChild(doc.createTextNode(string));
-    return div.innerHTML;
   },
 
   _formatNumber: function (number) {
@@ -312,7 +310,7 @@ Y.extend(Search, Y.Widget, {
         first: results.start + 1,
         last : results.start + results.count,
         total: this._formatNumber(results.deephits),
-        query: this._encodeEntities(this.get(QUERY))
+        query: this.get(QUERY)
       }
     }));
   },
@@ -492,7 +490,7 @@ Y.extend(Search, Y.Widget, {
    * @method _onHistoryChange
    * @protected
    */
-  _onHistoryChange: function (e) {
+  _afterHistoryChange: function (e) {
     var changed   = e.changed,
         newParsed = e.newParsed,
         removed   = e.removed;
@@ -541,6 +539,7 @@ Y.extend(Search, Y.Widget, {
    * @private
    */
   _defSearchFailureFn: function (e) {
+      // TODO: handle search failures
   },
 
   /**
@@ -550,13 +549,13 @@ Y.extend(Search, Y.Widget, {
   _defSearchSuccessFn: function (e) {
     var firstLink;
 
-    this._renderInfo('#bd .info');
-    this._renderWebResults('#results .web');
-    this._renderPagination('#bd .pg');
+    this._renderInfo(SELECTOR_INFO);
+    this._renderWebResults(SELECTOR_WEB_RESULTS);
+    this._renderPagination(SELECTOR_PAGINATION);
 
     win.scroll(0, 0);
 
-    firstLink = Y.one('#results .web a');
+    firstLink = Y.one(SELECTOR_FIRST_WEB_RESULT);
 
     if (firstLink) {
       firstLink.focus();
@@ -574,7 +573,6 @@ Y.Node.DOM_EVENTS.input = 1;
 }, '1.0.0', {
     requires: [
       'datatype-number', 'event', 'event-custom', 'gallery-history-lite',
-      'io-base', 'json-parse', 'node', 'substitute', 'widget'
+      'io-base', 'json-parse', 'node', 'widget'
     ]
 });
-
