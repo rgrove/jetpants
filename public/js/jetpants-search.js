@@ -422,6 +422,8 @@ Y.extend(Search, Y.Widget, {
     }
 
     results.query = this.get(QUERY);
+    results.start = this.get(RESULT_START) + 1;
+
     Y.one(parent).append(template.expand(results));
   },
 
