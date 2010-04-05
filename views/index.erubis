@@ -14,13 +14,7 @@
 
   <div id="bd">
     <div class="info" role="status"><p class="loading">Loading...</p></div>
-    <div id="results" role="main">
-      <h2 class="ol">Web Results</h2>
-      <div class="web"></div>
-
-      <h2 class="ol">Pagination</h2>
-      <div class="pg"></div>
-    </div>
+    <div id="results" role="main"></div>
   </div>
 
   <div id="ft" role="contentinfo">

@@ -1,51 +1,56 @@
---- 
-resultInfo: >
-  {.section info}
-    <p>
-    Results <strong>{first} - {last}</strong> of about <strong>{total}</strong>
-    for <strong>{query|html}</strong>
-    </p>
-  {.or}
-    <p>No results found.</p>
-  {.end}
-
-resultPagination: >
-  <ul role="navigation">
-    {.section prev}
-      <li class="prev"><a href="#{queryString}" rel="prev">Prev</a></li>
+---
+web:
+  info: >
+    {.section info}
+      <p>
+      Results <strong>{first} - {last}</strong> of about <strong>{total}</strong>
+      for <strong>{query|html}</strong>
+      </p>
+    {.or}
+      <p>No results found.</p>
     {.end}
 
-    {.repeated section pages}
-      <li>
-        {.section current}
-          <strong>{page}</strong>
-        {.or}
-          <a href="#{queryString}">{page}</a>
+  pagination: >
+    <h2 class="ol">Pagination</h2>
+    <div class="pg">
+      <ul role="navigation">
+        {.section prev}
+          <li class="prev"><a href="#{queryString}" rel="prev">Prev</a></li>
         {.end}
-      </li>
-    {.end}
+        {.repeated section pages}
+          <li>
+            {.section current}
+              <strong>{page}</strong>
+            {.or}
+              <a href="#{queryString}">{page}</a>
+            {.end}
+          </li>
+        {.end}
+        {.section next}
+          <li class="next"><a href="#{queryString}" rel="next">Next</a></li>
+        {.end}
+      </ul>
+    </div>
 
-    {.section next}
-      <li class="next"><a href="#{queryString}" rel="next">Next</a></li>
-    {.end}
-  </ul>
-
-results: >
-  {.section results}
-    <ol start="{start}">
-      {.repeated section @}
-        <li>
-          <h3 class="title"><a href="{url}">{title}</a></h3>
-          {# TODO: Make this a <p>}
-          <div class="abstract">{abstract}</div>
-          <cite>{dispurl}</cite>
-        </li>
+  results: >
+    <h2 class="ol">Web Results</h2>
+    <div class="web">
+      {.section results}
+        <ol start="{start}">
+          {.repeated section @}
+            <li>
+              <h3 class="title"><a href="{url}">{title}</a></h3>
+              {# TODO: Make this a <p>}
+              <div class="abstract">{abstract}</div>
+              <cite>{dispurl}</cite>
+            </li>
+          {.end}
+        </ol>
+      {.or}
+        <h3>Aw snap!</h3>
+        <p>
+          We scoured the vast wastelands of the Intertubes for
+          <strong>{query|html}</strong>, but we couldn't find anything. Sorry.
+        </p>
       {.end}
-    </ol>
-  {.or}
-    <h3>Aw snap!</h3>
-    <p>
-      We scoured the vast wastelands of the Intertubes for
-      <strong>{query|html}</strong>, but we couldn't find anything. Sorry.
-    </p>
-  {.end}
+    </div>

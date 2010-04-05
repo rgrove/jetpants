@@ -42,10 +42,9 @@ TEMPLATES     = 'templates',
 // Selectors.
 SELECTOR_FIRST_WEB_RESULT = '#results .web a',
 SELECTOR_INFO             = '#bd .info',
-SELECTOR_PAGINATION       = '#bd .pg',
 SELECTOR_SEARCH_FORM      = 'form.sf',
 SELECTOR_SEARCH_QUERY     = SELECTOR_SEARCH_FORM + ' input.q',
-SELECTOR_WEB_RESULTS      = '#results .web',
+SELECTOR_RESULTS          = '#results',
 
 // -- Public Events ------------------------------------------------------------
 
@@ -202,9 +201,7 @@ Search.ATTRS = {
   templates: {
     getter: function (templates) {
       // Compile templates on first use.
-      Y.Object.each(templates, function (template, name) {
-        templates[name] = jsontemplate.Template(template);
-      }, this);
+      templates = this._compileTemplates(templates);
 
       // Remove this getter to ensure that compilation only occurs once.
       this.modifyAttr(TEMPLATES, {getter: null});
@@ -233,6 +230,7 @@ Y.extend(Search, Y.Widget, {
 
   bindUI: function () {
     this.after('queryChange', this._afterQueryChange);
+    this.after('resultsChange', this._afterResultsChange);
 
     this.get(SEARCH_FORMS).on('submit', this._onSubmit, this);
     this.get(QUERY_NODES).after('input', this._afterQueryInput, this);
@@ -292,6 +290,18 @@ Y.extend(Search, Y.Widget, {
     return _params.join('&');
   },
 
+  _compileTemplates: function (templates) {
+    if (Lang.isObject(templates)) {
+      Y.Object.each(templates, function (value, name) {
+        templates[name] = this._compileTemplates(value);
+      }, this);
+
+      return templates;
+    } else {
+      return jsontemplate.Template(templates);
+    }
+  },
+
   _formatNumber: function (number) {
     return Y.DataType.Number.format(number, {
       thousandsSeparator: ','
@@ -300,10 +310,14 @@ Y.extend(Search, Y.Widget, {
 
   _renderInfo: function (parent) {
     var parentNode = Y.one(parent),
-        results    = this.get(RESULTS),
-        template   = this.get(TEMPLATES + '.resultInfo');
+        results    = this.get(RESULTS + '.web'),
+        template   = this.get(TEMPLATES + '.web.info');
 
     parentNode.get('children').remove();
+
+    if (!results) {
+      return;
+    }
 
     parentNode.append(template.expand({
       info: !results.count ? false : {
@@ -319,19 +333,20 @@ Y.extend(Search, Y.Widget, {
     var currentPage = 1,
         i,
         pagination,
-        parentNode  = Y.one(parent),
         pages       = [],
         queryParams,
-        results     = this.get(RESULTS),
+        results     = this.get(RESULTS + '.web'),
         resultCount = this.get(RESULT_COUNT),
         resultStart = this.get(RESULT_START),
-        template    = this.get(TEMPLATES + '.resultPagination'),
+        template    = this.get(TEMPLATES + '.web.pagination'),
         that        = this,
         totalPages  = 1,
         windowEnd,
         windowStart;
 
-    parentNode.get('children').remove();
+    if (!results) {
+      return;
+    }
 
     if (results.totalhits) {
       totalPages  = Math.min(100, Math.ceil(results.totalhits / resultCount));
@@ -384,18 +399,19 @@ Y.extend(Search, Y.Widget, {
       }())
     };
 
-    parentNode.append(template.expand(pagination));
+    Y.one(parent).append(template.expand(pagination));
   },
 
   _renderWebResults: function (parent) {
-    var parentNode = Y.one(parent),
-        results    = this.get(RESULTS),
-        template   = this.get(TEMPLATES + '.results');
+    var results  = this.get(RESULTS + '.web'),
+        template = this.get(TEMPLATES + '.web.results');
+
+    if (!results) {
+      return;
+    }
 
     results.query = this.get(QUERY);
-
-    parentNode.get('children').remove();
-    parentNode.append(template.expand(results));
+    Y.one(parent).append(template.expand(results));
   },
 
   _search: function () {
@@ -444,7 +460,7 @@ Y.extend(Search, Y.Widget, {
           var facade = Y.merge(config, {response: response});
 
           try {
-            facade.results = Y.JSON.parse(response.responseText).web;
+            facade.results = Y.JSON.parse(response.responseText);
           } catch (ex) {
             facade.exception = ex;
             this.fire(EVT_SEARCH_FAILURE, facade);
@@ -459,32 +475,6 @@ Y.extend(Search, Y.Widget, {
   },
 
   // -- Protected Event Handlers -----------------------------------------------
-
-  /**
-   * @method _afterQueryChange
-   * @protected
-   */
-  _afterQueryChange: function (e) {
-    var query = e.newVal,
-        root  = Y.one(doc.documentElement);
-
-    this.set(PENDING_QUERY, query || '');
-    this.syncUI();
-
-    if (query) {
-    } else {
-      root.addClass('entry');
-      doc.title = 'Jetpants Search';
-    }
-  },
-
-  /**
-   * @method _afterQueryInput
-   *
-   */
-  _afterQueryInput: function (e) {
-    this.set(PENDING_QUERY, e.currentTarget.get('value'));
-  },
 
   /**
    * @method _onHistoryChange
@@ -510,6 +500,48 @@ Y.extend(Search, Y.Widget, {
   },
 
   /**
+   * @method _afterQueryChange
+   * @protected
+   */
+  _afterQueryChange: function (e) {
+    var query = e.newVal,
+        root  = Y.one(doc.documentElement);
+
+    this.set(PENDING_QUERY, query || '');
+    this._set(RESULTS, {});
+
+    if (query) {
+      root.removeClass('entry');
+      doc.title = e.query + ' - Jetpants Search';
+    } else {
+      root.addClass('entry');
+      doc.title = 'Jetpants Search';
+    }
+  },
+
+  /**
+   * @method _afterQueryInput
+   * @protected
+   */
+  _afterQueryInput: function (e) {
+    this.set(PENDING_QUERY, e.currentTarget.get('value'));
+  },
+
+  /**
+   * @method _afterResultsChange
+   * @protected
+   */
+  _afterResultsChange: function (e) {
+    var resultsNode = Y.one(SELECTOR_RESULTS);
+
+    resultsNode.get('children').remove();
+
+    this._renderInfo(SELECTOR_INFO);
+    this._renderWebResults(resultsNode);
+    this._renderPagination(resultsNode);
+  },
+
+  /**
    * Handles search form submission.
    *
    * @method _onSubmit
@@ -527,11 +559,7 @@ Y.extend(Search, Y.Widget, {
    * @private
    */
   _defSearchFn: function (e) {
-    this._set(RESULTS, {});
     this._search();
-
-    DOM.removeClass(doc.documentElement, 'entry');
-    doc.title = e.query + ' - Jetpants Search';
   },
 
   /**
@@ -548,10 +576,6 @@ Y.extend(Search, Y.Widget, {
    */
   _defSearchSuccessFn: function (e) {
     var firstLink;
-
-    this._renderInfo(SELECTOR_INFO);
-    this._renderWebResults(SELECTOR_WEB_RESULTS);
-    this._renderPagination(SELECTOR_PAGINATION);
 
     win.scroll(0, 0);
 
