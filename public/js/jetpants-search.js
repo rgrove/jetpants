@@ -233,7 +233,17 @@ Y.extend(Search, Y.Widget, {
     this.after('resultsChange', this._afterResultsChange);
 
     this.get(SEARCH_FORMS).on('submit', this._onSubmit, this);
-    this.get(QUERY_NODES).after('input', this._afterQueryInput, this);
+
+    if (Y.UA.ie) {
+      // In IE, use the propertychange event to simulate the input event.
+      this.get(QUERY_NODES).after('propertychange', function (e) {
+        if (e._event.propertyName === 'value') {
+          this._afterQueryInput(e);
+        }
+      }, this);
+    } else {
+      this.get(QUERY_NODES).after('input', this._afterQueryInput, this);
+    }
   },
 
   renderUI: function () {
@@ -605,8 +615,9 @@ Y.extend(Search, Y.Widget, {
 
 Y.namespace('Jetpants').Search = Search;
 
-// TODO: need to file a bug to get this added to YUI.
-Y.Node.DOM_EVENTS.input = 1;
+// TODO: need to file a bug to get these added to YUI.
+Node.DOM_EVENTS.input = 1;
+Node.DOM_EVENTS.propertychange = 1;
 
 }, '1.0.0', {
     requires: [
