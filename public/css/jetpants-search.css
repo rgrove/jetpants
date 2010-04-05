@@ -18,6 +18,13 @@ body {
   padding: 12px 24px;
 }
 
+cite { font-style: normal; }
+
+ol, ul {
+  list-style: none;
+  padding: 0;
+}
+
 #doc { min-width: 600px; }
 #doc.entry { max-width: none; }
 #doc.loading { display: none; }
@@ -99,27 +106,19 @@ body {
 .info p { margin: 0; }
 .info p.loading { color: #afafaf; }
 
-/* -- Results --------------------------------------------------------------- */
-#results { padding: 0 0 16px 12px; }
-
+/* -- Web Results ----------------------------------------------------------- */
 .web {
   font-size: 13px;
   line-height: 1.3em;
+  padding-left: 12px;
 }
 
 .web cite {
   color: #568e1a;
-  font-style: normal;
   word-wrap: break-word;
 }
 
 .web li { margin-top: 1.3em; }
-
-.web ol {
-  list-style: none;
-  padding: 0;
-}
-
 .web .abstract { max-width: 42em; }
 
 .web .title {
@@ -130,9 +129,34 @@ body {
 
 .web .title a { text-decoration: underline; }
 
+/* -- Twitter Results ------------------------------------------------------- */
+.twitter {
+  border: 1px solid #dfdfdf;
+  font-size: 11px;
+  margin: 1em 0 2em;
+  padding: 0 12px;
+}
+
+.twitter h2 {
+  font-size: 12px;
+}
+
+.twitter li {
+  margin-bottom: 0.6em;
+}
+
+.twitter li p {
+  margin: 0;
+  max-width: 46em;
+}
+
+.twitter .meta,
+.twitter .meta a { color: #777; }
+
 /* -- Pagination ------------------------------------------------------------ */
 .pg {
-  margin: 2em 0 1em;
+  line-height: 1.1em;
+  margin: 2em 0 1em 12px;
 }
 
 .pg:after {
@@ -168,11 +192,6 @@ body {
   border-color: #2663CF;
   color: #fff;
   font-weight: bold;
-}
-
-.pg ul {
-  list-style: none;
-  padding: 0;
 }
 
 .pg .next,

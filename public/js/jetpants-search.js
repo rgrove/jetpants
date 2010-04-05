@@ -402,6 +402,17 @@ Y.extend(Search, Y.Widget, {
     Y.one(parent).append(template.expand(pagination));
   },
 
+  _renderTwitterResults: function (parent) {
+    var results  = this.get(RESULTS + '.twitter'),
+        template = this.get(TEMPLATES + '.twitter.results');
+
+    if (!results || !results.results || !results.results.length) {
+      return;
+    }
+
+    Y.one(parent).append(template.expand(results));
+  },
+
   _renderWebResults: function (parent) {
     var results  = this.get(RESULTS + '.web'),
         template = this.get(TEMPLATES + '.web.results');
@@ -510,10 +521,7 @@ Y.extend(Search, Y.Widget, {
     this.set(PENDING_QUERY, query || '');
     this._set(RESULTS, {});
 
-    if (query) {
-      root.removeClass('entry');
-      doc.title = e.query + ' - Jetpants Search';
-    } else {
+    if (!query) {
       root.addClass('entry');
       doc.title = 'Jetpants Search';
     }
@@ -537,6 +545,7 @@ Y.extend(Search, Y.Widget, {
     resultsNode.get('children').remove();
 
     this._renderInfo(SELECTOR_INFO);
+    this._renderTwitterResults(resultsNode);
     this._renderWebResults(resultsNode);
     this._renderPagination(resultsNode);
   },
@@ -559,6 +568,9 @@ Y.extend(Search, Y.Widget, {
    * @private
    */
   _defSearchFn: function (e) {
+    DOM.removeClass(doc.documentElement, 'entry');
+    doc.title = e.query + ' - Jetpants Search';
+
     this._search();
   },
 

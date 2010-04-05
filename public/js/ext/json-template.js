@@ -100,6 +100,7 @@ var DEFAULT_FORMATTERS = {
   'htmltag': HtmlTagEscape,
   'html-attr-value': HtmlTagEscape,
   'str': ToString,
+  'url-param-value': encodeURIComponent,
   'raw': function(x) { return x; },
   'AbsUrl': function(value, context) {
     // TODO: Normalize leading/trailing slashes

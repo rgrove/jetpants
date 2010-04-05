@@ -2,5 +2,5 @@
 # -- Static resources ----------------------------------------------------------
 resources:
   jetpants-search:
-    css: http://cdn.jetpants.com/css/jetpants-search-201004041752.css
-    js: http://cdn.jetpants.com/js/jetpants-search-201004041752.js
+    css: http://cdn.jetpants.com/css/jetpants-search-201004042249.css
+    js: http://cdn.jetpants.com/js/jetpants-search-201004042249.js

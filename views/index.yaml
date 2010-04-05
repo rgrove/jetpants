@@ -1,4 +1,23 @@
 ---
+twitter:
+  results: >
+    <div class="twitter" role="complementary">
+      <h2>Twitter Results</h2>
+      {.section results}
+        <ul>
+          {.repeated section @}
+            <li>
+              <p lang="{iso_language_code}">
+                <cite><a href="http://twitter.com/{from_user}">{from_user}</a></cite>: {text}
+              </p>
+              <span class="meta"><a href="http://twitter.com/{from_user}/status/{id}">{created_at}</a></span>
+            </li>
+          {.end}
+        </ul>
+      {.end}
+      <p><a href="http://search.twitter.com/search?q={query|url-param-value}">More Twitter Search results...</a></p>
+    </div>
+
 web:
   info: >
     {.section info}
@@ -11,8 +30,8 @@ web:
     {.end}
 
   pagination: >
-    <h2 class="ol">Pagination</h2>
     <div class="pg">
+      <h2 class="ol">Pagination</h2>
       <ul role="navigation">
         {.section prev}
           <li class="prev"><a href="#{queryString}" rel="prev">Prev</a></li>
@@ -33,8 +52,8 @@ web:
     </div>
 
   results: >
-    <h2 class="ol">Web Results</h2>
     <div class="web">
+      <h2 class="ol">Web Results</h2>
       {.section results}
         <ol start="{start}">
           {.repeated section @}
