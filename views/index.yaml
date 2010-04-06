@@ -7,10 +7,17 @@ twitter:
         <ul>
           {.repeated section @}
             <li>
-              <p lang="{iso_language_code}">
+              <p>
                 <cite><a href="http://twitter.com/{from_user}">{from_user}</a></cite>: {text}
               </p>
-              <span class="meta"><a href="http://twitter.com/{from_user}/status/{id}">{created_at}</a></span>
+              <div class="meta">
+                <span class="created"><a href="http://twitter.com/{from_user}/status/{id}">{created_ago} ago</a></span>
+                {.section metadata}
+                  {.section recent_retweets}
+                    <span class="retweets">{@}+ recent retweets</span>
+                  {.end}
+                {.end}
+              </div>
             </li>
           {.end}
         </ul>
