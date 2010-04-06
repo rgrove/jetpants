@@ -26,6 +26,7 @@ var doc       = Y.config.doc,
     History   = Y.HistoryLite,
     Lang      = Y.Lang,
     Node      = Y.Node,
+    UI        = Y.Widget.UI_SRC,
 
 // Attribute names.
 API_URL       = 'apiUrl',
@@ -70,6 +71,7 @@ EVT_SEARCH_SUCCESS = 'searchSuccess';
 
 // -- Static Properties --------------------------------------------------------
 Search.NAME  = 'search';
+
 Search.ATTRS = {
   /**
    * URL of the Jetpants Search API.
@@ -229,6 +231,7 @@ Y.extend(Search, Y.Widget, {
   // },
 
   bindUI: function () {
+    this.after('pendingQueryChange', this._afterPendingQueryChange);
     this.after('queryChange', this._afterQueryChange);
     this.after('resultsChange', this._afterResultsChange);
 
@@ -523,6 +526,16 @@ Y.extend(Search, Y.Widget, {
   },
 
   /**
+   * @method _afterPendingQueryChange
+   * @protected
+   */
+  _afterPendingQueryChange: function (e) {
+    if (e.src !== UI) {
+      this.get(QUERY_NODES).set('value', e.newVal || '');
+    }
+  },
+
+  /**
    * @method _afterQueryChange
    * @protected
    */
@@ -544,7 +557,7 @@ Y.extend(Search, Y.Widget, {
    * @protected
    */
   _afterQueryInput: function (e) {
-    this.set(PENDING_QUERY, e.currentTarget.get('value'));
+    this.set(PENDING_QUERY, e.currentTarget.get('value'), {src: UI});
   },
 
   /**
