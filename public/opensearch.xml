@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>Jetpants</ShortName>
+  <LongName>Jetpants Search</LongName>
+  <Description>Search the Internets with Jetpants!</Description>
+  <!-- <Image height="16" width="16" type="image/png"></Image> -->
+  <Tags>search web twitter real-time</Tags>
+  <Contact>ryan@wonko.com</Contact>
+  <Url type="text/html" method="GET" template="http://jetpants.heroku.com/#q={searchTerms}" />
+  <Query role="example" searchTerms="ninjas" />
+  <Developer>Ryan Grove</Developer>
+  <moz:SearchForm>http://jetpants.heroku.com/</moz:SearchForm>
+</OpenSearchDescription>
