@@ -368,8 +368,8 @@ Y.extend(Search, Y.Widget, {
     }
 
     queryParams = {
-      q    : this.get(QUERY),
-      count: resultCount
+      q    : this.get(QUERY)
+      // count: resultCount // No need to send count yet, since there's no way to customize it
     };
 
     windowStart = Math.max(1, currentPage - 5);
@@ -570,7 +570,12 @@ Y.extend(Search, Y.Widget, {
    */
   _onSubmit: function (e) {
     e.preventDefault();
-    History.add({q: this.get(PENDING_QUERY)});
+
+    History.add({
+      q    : this.get(PENDING_QUERY),
+      count: null,
+      start: null
+    });
   },
 
   // -- Private Event Handlers -------------------------------------------------
