@@ -41,7 +41,7 @@ TEMPLATES     = 'templates',
 
 // Selectors.
 SELECTOR_FIRST_WEB_RESULT = '#results .web a',
-SELECTOR_INFO             = '#bd .info',
+SELECTOR_INFO             = '#hd .info',
 SELECTOR_SEARCH_FORM      = 'form.sf',
 SELECTOR_SEARCH_QUERY     = SELECTOR_SEARCH_FORM + ' input.q',
 SELECTOR_RESULTS          = '#results',

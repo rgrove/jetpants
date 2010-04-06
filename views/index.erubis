@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="entry">
+<html class="entry" lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <title>Jetpants Search</title>
@@ -10,10 +10,10 @@
 <div class="loading" id="doc">
   <div id="hd">
     <%= erubis(:'partial/searchbox') %>
+    <div class="info" role="status"><p class="loading">Loading...</p></div>
   </div>
 
   <div id="bd">
-    <div class="info" role="status"><p class="loading">Loading...</p></div>
     <div id="results" role="main"></div>
   </div>
 
