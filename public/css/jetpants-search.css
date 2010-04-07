@@ -238,7 +238,7 @@ ol, ul {
 /* -- Footer ---------------------------------------------------------------- */
 #ft {
   border-top: 2px solid #cfe0ff;
-  margin: 0 24px;
+  margin: 2em 24px 0;
   padding: 4px 6px 18px;
 }
 
