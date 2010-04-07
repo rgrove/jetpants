@@ -69,6 +69,9 @@ web:
               {# TODO: Make this a <p>}
               <div class="abstract">{abstract}</div>
               <cite>{dispurl}</cite>
+              {.section delicious}{.section saves}
+                <a href="http://delicious.com/url/view?url={url|url-param-value}" class="delicious-saves">Saved {@} times on Delicious</a>
+              {.end}{.end}
             </li>
           {.end}
         </ol>

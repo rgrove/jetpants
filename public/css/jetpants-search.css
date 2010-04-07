@@ -143,6 +143,24 @@ ol, ul {
 .web li.indent { margin-left: 2.5em; }
 .web .abstract { max-width: 42em; }
 
+.web .delicious-saves {
+  background: #eff8ff;
+  border: 1px solid #c1e0f7;
+  border-radius: 3px;
+  color: #555;
+  font-size: 11px;
+  margin-left: 0.2em;
+  padding: 1px 3px 0;
+  text-decoration: none;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+.web .delicious-saves:hover {
+  background: #d7eeff;
+  border-color: #7fc9ff;
+}
+
 .web .title {
   font-size: 16px;
   font-weight: normal;
