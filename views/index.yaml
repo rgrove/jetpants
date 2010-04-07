@@ -64,7 +64,7 @@ web:
       {.section results}
         <ol start="{start}">
           {.repeated section @}
-            <li>
+            <li{.section indent} class="indent"{.end}>
               <h3 class="title"><a href="{url}">{title}</a></h3>
               {# TODO: Make this a <p>}
               <div class="abstract">{abstract}</div>

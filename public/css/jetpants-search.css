@@ -140,6 +140,7 @@ ol, ul {
 }
 
 .web li { margin-top: 1.3em; }
+.web li.indent { margin-left: 2.5em; }
 .web .abstract { max-width: 42em; }
 
 .web .title {
