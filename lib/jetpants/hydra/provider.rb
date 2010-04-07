@@ -39,6 +39,18 @@ class Jetpants; class Provider
   # response, or that the response was an error) or a Hash containing parsed
   # data extracted from the response.
   def extract(response)
+    # Raise on HTTP error codes. A response code of 0 means that the request
+    # timed out, which we don't raise for.
+    case response.code.to_i
+    when 200 then
+      response
+
+    when 0
+      nil
+
+    else
+      raise Error, "HTTP #{response.code} response from #{url}"
+    end
   end
 
   # Returns the URL (as a String) that should be used to perform the request for
@@ -46,6 +58,8 @@ class Jetpants; class Provider
   # for this Provider.
   def url
   end
+
+  class Error < Jetpants::Error; end
 
   # Various utility methods for providers.
   module Utils

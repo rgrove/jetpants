@@ -18,8 +18,7 @@ class Jetpants::Provider::BOSS < Jetpants::Provider
   end
 
   def extract(response)
-    # TODO: log errors
-    return nil unless response.code.to_i == 200
+    return nil unless super(response)
 
     parsed_response = Yajl::Parser.parse(response.body, :symbolize_keys => true)[:ysearchresponse]
 
@@ -33,10 +32,6 @@ class Jetpants::Provider::BOSS < Jetpants::Provider
 
       :parsed_response => parsed_response
     }
-
-  # TODO: rescue other errors as well?
-  rescue Yajl::ParseError => ex
-    return nil
   end
 
   def url

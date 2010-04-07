@@ -19,8 +19,7 @@ class Jetpants::Provider::Twitter < Jetpants::Provider
   end
 
   def extract(response)
-    # TODO: log errors
-    return nil unless response.code.to_i == 200
+    return nil unless super(response)
 
     now             = Time.now
     parsed_response = Yajl::Parser.parse(response.body, :symbolize_keys => true)
