@@ -1,5 +1,3 @@
-require 'uri'
-
 class Jetpants::Provider::BOSS::Web < Jetpants::Provider::BOSS
   def initialize(options = {})
     super(options.merge({:vertical => :web}))
@@ -38,7 +36,7 @@ class Jetpants::Provider::BOSS::Web < Jetpants::Provider::BOSS
 
   def indent?(result, prev_result)
     return false unless result && prev_result
-    URI.parse(result[:url]).host == URI.parse(prev_result[:url]).host
+    url_host(result[:url]) == url_host(prev_result[:url])
   end
 
 end

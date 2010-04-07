@@ -1,6 +1,8 @@
 require 'yajl'
 
 class Jetpants; class Provider
+  include Jetpants::Utils
+
   autoload :BOSS,    'jetpants/hydra/provider/boss'
   autoload :Twitter, 'jetpants/hydra/provider/twitter'
 
@@ -60,52 +62,4 @@ class Jetpants; class Provider
   end
 
   class Error < Jetpants::Error; end
-
-  # Various utility methods for providers.
-  module Utils
-
-    # Return the bytesize of String; uses String#length under Ruby 1.8 and
-    # String#bytesize under 1.9. (Stolen from Rack)
-    if ''.respond_to?(:bytesize)
-      def bytesize(string)
-        string.bytesize
-      end
-    else
-      def bytesize(string)
-        string.size
-      end
-    end
-    module_function :bytesize
-
-    # Builds a query string from a Hash. (Stolen from Rack)
-    def build_query(params)
-      params.map { |k, v|
-        if v.class == Array
-          build_query(v.map { |x| [k, x] })
-        else
-          "#{escape(k)}=#{escape(v)}"
-        end
-      }.join("&")
-    end
-    module_function :build_query
-
-    # Performs URI escaping. (Stolen from Rack)
-    def escape(s)
-      s.to_s.gsub(/([^ a-zA-Z0-9_.-]+)/n) {
-        '%' + $1.unpack('H2' * bytesize($1)).join('%').upcase
-      }.tr(' ', '+')
-    end
-    module_function :escape
-
-    # Unescapes a URI-escaped string. (Stolen from Rack)
-    def unescape(s)
-      s.tr('+', ' ').gsub(/((?:%[0-9a-fA-F]{2})+)/n) {
-        [$1.delete('%')].pack('H*')
-      }
-    end
-    module_function :unescape
-
-  end
-
-  include Utils
 end; end

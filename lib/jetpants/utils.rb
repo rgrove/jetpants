@@ -1,4 +1,38 @@
 class Jetpants; module Utils
+  REGEX_URL_HOST = %r{^https?://([^/]+)}
+
+  # Return the bytesize of String; uses String#length under Ruby 1.8 and
+  # String#bytesize under 1.9. (Stolen from Rack)
+  if ''.respond_to?(:bytesize)
+    def bytesize(string)
+      string.bytesize
+    end
+  else
+    def bytesize(string)
+      string.size
+    end
+  end
+  module_function :bytesize
+
+  # Builds a query string from a Hash. (Stolen from Rack)
+  def build_query(params)
+    params.map { |k, v|
+      if v.class == Array
+        build_query(v.map { |x| [k, x] })
+      else
+        "#{escape(k)}=#{escape(v)}"
+      end
+    }.join("&")
+  end
+  module_function :build_query
+
+  # Performs URI escaping. (Stolen from Rack)
+  def escape(s)
+    s.to_s.gsub(/([^ a-zA-Z0-9_.-]+)/n) {
+      '%' + $1.unpack('H2' * bytesize($1)).join('%').upcase
+    }.tr(' ', '+')
+  end
+  module_function :escape
 
   # Returns the approximate difference between two Time objects in English.
   # Based on distance_of_time_in_words in the Rails ActionView DateHelper.
@@ -40,5 +74,21 @@ class Jetpants; module Utils
     end
   end
   module_function :time_diff_in_words
+
+  # Unescapes a URI-escaped string. (Stolen from Rack)
+  def unescape(s)
+    s.tr('+', ' ').gsub(/((?:%[0-9a-fA-F]{2})+)/n) {
+      [$1.delete('%')].pack('H*')
+    }
+  end
+  module_function :unescape
+
+  # Returns the host portion of an HTTP or HTTPS URL. This method uses a simple
+  # (and very loose) regex rather than using the URI class since URI's parser is
+  # unnecessarily strict.
+  def url_host(url)
+    (url.match(REGEX_URL_HOST) || [])[1]
+  end
+  module_function :url_host
 
 end; end
