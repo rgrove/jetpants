@@ -1,10 +1,17 @@
 require 'erubis'
+require 'lilypad'
 require 'sinatra/base'
 require 'yajl'
 
 class Jetpants::Base < Sinatra::Base
-  set :config, File.exist?(Jetpants::CONFIG_FILE) ? YAML.load_file(Jetpants::CONFIG_FILE) : {}
-  set :root,   Jetpants::ROOT_DIR
+  set :config,  File.exist?(Jetpants::CONFIG_FILE) ? YAML.load_file(Jetpants::CONFIG_FILE) : {}
+  set :logging, true
+  set :root,    Jetpants::ROOT_DIR
+
+  use Rack::Lilypad do
+    api_key ENV['JETPANTS_HOPTOAD_KEY']
+    sinatra
+  end
 
   not_found do
     @q = unescape(request.path.gsub('/', ' ').strip)
