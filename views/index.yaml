@@ -1,28 +1,34 @@
 ---
 twitter:
   results: >
-    <div class="twitter" role="complementary">
-      <h2>Twitter Results</h2>
-      {.section results}
-        <ul>
-          {.repeated section @}
-            <li>
-              <p>
-                <cite><a href="http://twitter.com/{from_user}">{from_user}</a></cite>: {text}
-              </p>
-              <div class="meta">
-                <span class="created"><a href="http://twitter.com/{from_user}/status/{id}">{created_ago} ago</a></span>
-                {.section metadata}
-                  {.section recent_retweets}
-                    <span class="retweets">{@}+ recent retweets</span>
+    <div class="sc twitter" role="complementary">
+      <div class="hd">
+        <h2>Twitter Results</h2>
+      </div>
+      <div class="bd">
+        {.section results}
+          <ul>
+            {.repeated section @}
+              <li>
+                <p>
+                  <cite><a href="http://twitter.com/{from_user}">{from_user}</a></cite>: {text}
+                </p>
+                <div class="meta">
+                  <span class="created"><a href="http://twitter.com/{from_user}/status/{id}">{created_ago} ago</a></span>
+                  {.section metadata}
+                    {.section recent_retweets}
+                      <span class="retweets">{@}+ recent retweets</span>
+                    {.end}
                   {.end}
-                {.end}
-              </div>
-            </li>
-          {.end}
-        </ul>
-      {.end}
-      <p><a href="http://search.twitter.com/search?q={query|url-param-value}">More Twitter Search results...</a></p>
+                </div>
+              </li>
+            {.end}
+          </ul>
+        {.end}
+      </div>
+      <div class="ft">
+        <p><a href="http://search.twitter.com/search?q={query|url-param-value}">More Twitter Search results...</a></p>
+      </div>
     </div>
 
 web:

@@ -71,6 +71,15 @@ ol, ul {
   width: 480px;
 }
 
+.ie .q,
+.opera .q {
+  padding-bottom: 4px;
+  position: relative;
+}
+
+.ie .q { top: 1px; }
+.opera .q { top: -2px; }
+
 .webkit .q {
   width: 500px;
   -webkit-appearance: textfield;
@@ -169,34 +178,52 @@ ol, ul {
 
 .web .title a { text-decoration: underline; }
 
-/* -- Twitter Results ------------------------------------------------------- */
-.twitter {
-  border: 1px solid #dfdfdf;
+/* -- Shortcut Styles ------------------------------------------------------- */
+.sc {
+  border-radius: 5px;
+  box-shadow: 0 0 4px #b2b2b2;
   font-size: 11px;
-  margin: 1em 0 2em;
-  padding: 0 12px;
+  max-width: 55em;
+  margin: 1em 5px 2em;
+  padding: 1px 7px 1px;
   zoom: 1;
   *padding: 12px;
+  -moz-border-radius: 5px;
+  -moz-box-shadow: 0 0 4px #b2b2b2;
+  -webkit-border-radius: 5px;
+  -webkit-box-shadow: 0 0 4px #b2b2b2;
 }
 
-.twitter h2 {
+.ie .sc,
+.opera .sc {
+  border: 1px solid #dfdfdf;
+}
+
+.sc .hd h2 {
+  background: #eee;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
   font-size: 12px;
-  margin-bottom: 0.7em;
+  margin: 2px -4px 0.7em;
+  padding: 3px 4px 2px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
 
+.sc .ft p { margin-bottom: 8px; }
+
+/* -- Twitter Shortcut ------------------------------------------------------ */
 .twitter li { margin-bottom: 0.7em; }
 
 .twitter li p {
   margin: 0;
-  max-width: 46em;
+  max-width: 50em;
 }
 
 .twitter .meta,
 .twitter .meta a { color: #777; }
 
-.twitter .meta {
-  margin-top: 2px;
-}
+.twitter .meta { margin-top: 2px; }
 
 .twitter .retweets {
   background: #fffcd7;
