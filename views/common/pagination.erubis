@@ -1,0 +1,20 @@
+<div class="pg jsont">
+  <h2 class="ol">Pagination</h2>
+  <ul role="navigation">
+    {.section prev}
+      <li class="prev"><a href="#{queryString}" rel="prev">Prev</a></li>
+    {.end}
+    {.repeated section pages}
+      <li>
+        {.section current}
+          <strong>{page}</strong>
+        {.or}
+          <a href="#{queryString}">{page}</a>
+        {.end}
+      </li>
+    {.end}
+    {.section next}
+      <li class="next"><a href="#{queryString}" rel="next">Next</a></li>
+    {.end}
+  </ul>
+</div>

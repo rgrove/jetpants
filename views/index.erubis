@@ -10,7 +10,7 @@
 
 <div class="loading" id="doc">
   <div id="hd">
-    <%= erubis(:'partial/searchbox') %>
+    <%= erubis(:'common/searchbox') %>
   </div>
 
   <div id="bd">
@@ -18,17 +18,14 @@
   </div>
 
   <div id="ft" role="contentinfo">
-    <%= erubis(:'partial/copyright') %>
+    <%= erubis(:'common/copyright') %>
   </div>
 </div>
 
 <script src="<%== @resources['jetpants-search']['js'] %>"></script>
 <script>
   var Y = YUI({fetchCSS:false, bootstrap: false}).use('jetpants-search', function (Y) {
-    (new Y.Jetpants.Search({
-      contentBox: '#doc',
-      templates: <%= @templates %>
-    })).render();
+    (new Y.Jetpants.Search({contentBox: '#doc'})).render();
   });
 </script>
 

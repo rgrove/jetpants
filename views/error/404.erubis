@@ -16,7 +16,7 @@
     for it?
     </p>
 
-    <%= erubis(:'partial/searchbox') %>
+    <%= erubis(:'common/searchbox') %>
   </div>
 </div>
 

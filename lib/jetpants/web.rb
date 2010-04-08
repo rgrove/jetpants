@@ -12,8 +12,6 @@ class Jetpants::Web < Jetpants::Base
     cache_control(:public, :max_age => 1800)
 
     @resources = Jetpants::Config['resources']
-    @templates = json_templates(:index)
-
     erubis(:index)
   end
 

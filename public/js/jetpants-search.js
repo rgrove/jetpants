@@ -194,23 +194,13 @@ Search.ATTRS = {
   },
 
   /**
-   * JSON templates.
+   * Compiled JSON templates.
    *
    * @attribute templates
    * @type Object
    */
   templates: {
-    getter: function (templates) {
-      // Compile templates on first use.
-      templates = this._compileTemplates(templates);
-
-      // Remove this getter to ensure that compilation only occurs once.
-      this.modifyAttr(TEMPLATES, {getter: null});
-
-      return templates;
-    },
-
-    writeOnce: true,
+    readOnly: true,
     value: {}
   }
 };
@@ -290,7 +280,6 @@ Y.extend(Search, Y.Widget, {
 
   // -- Protected Methods ------------------------------------------------------
 
-  // TODO: use YUI for this?
   _buildQueryString: function (params) {
     var _params = [],
         encode  = encodeURIComponent;
@@ -395,7 +384,7 @@ Y.extend(Search, Y.Widget, {
 
   _renderTwitterResults: function (parent) {
     var results  = this.get(RESULTS + '.twitter'),
-        template = this.get(TEMPLATES + '.twitter.results');
+        template = this.get(TEMPLATES + '.twitter');
 
     if (!results || !results.results || !results.results.length) {
       return;
@@ -543,7 +532,13 @@ Y.extend(Search, Y.Widget, {
    * @protected
    */
   _afterResultsChange: function (e) {
-    var resultsNode = Y.one(SELECTOR_RESULTS);
+    var results     = e.newVal,
+        resultsNode = Y.one(SELECTOR_RESULTS);
+
+    // Extract JSON templates from the response and compile them.
+    if (results.templates) {
+      this._set('templates', this._compileTemplates(results.templates));
+    }
 
     resultsNode.get('children').remove();
 

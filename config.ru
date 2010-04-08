@@ -22,5 +22,3 @@ if Jetpants::RACK_ENV == :development
     run Weld::Server
   end
 end
-
-

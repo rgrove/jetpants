@@ -47,7 +47,21 @@ class Jetpants::Api < Jetpants::Base
         )
       end
 
-      hydra.run
+      results = hydra.run
+
+      # Add templates.
+      results[:templates] = {
+        :web => {
+          :pagination => erubis(:'common/pagination'),
+          :results    => erubis(:'results/web')
+        }
+      }
+
+      if results[:twitter]
+        results[:templates][:twitter] = erubis(:'results/shortcuts/twitter')
+      end
+
+      results
     end
   end
 
