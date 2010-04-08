@@ -35,7 +35,7 @@ ol, ul {
   background: -webkit-gradient(linear, left top, left bottom, from(#cfe0ff), to(#ffffff));
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffcfe0ff,endColorstr=#ffffffff);
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffcfe0ff,endColorstr=#ffffffff)";
-  padding: 14px 24px 0;
+  padding: 14px 24px 20px;
 }
 
 .entry #hd { border: 0; }
@@ -60,14 +60,10 @@ ol, ul {
   padding: 4px 0;
 }
 
-/* Search form */
-.sf {
-  margin: 0 0 14px;
-}
-
 /* Search query */
 .q {
   border: 1px solid #92b7df;
+  padding-left: 8px;
   width: 480px;
 }
 
@@ -140,7 +136,7 @@ ol, ul {
 .web {
   font-size: 13px;
   line-height: 1.3em;
-  padding-left: 12px;
+  padding-left: 10px;
 }
 
 .web cite {
@@ -183,9 +179,9 @@ ol, ul {
   border-radius: 5px;
   box-shadow: 0 0 4px #b2b2b2;
   font-size: 11px;
-  max-width: 55em;
-  margin: 1em 5px 2em;
-  padding: 1px 7px 1px;
+  margin: 0 0 28px;
+  padding: 1px 11px 1px;
+  width: 575px;
   zoom: 1;
   *padding: 12px;
   -moz-border-radius: 5px;
@@ -197,6 +193,7 @@ ol, ul {
 .ie .sc,
 .opera .sc {
   border: 1px solid #dfdfdf;
+  width: 573px;
 }
 
 .sc .hd h2 {
@@ -204,8 +201,8 @@ ol, ul {
   border: 1px solid #eaeaea;
   border-radius: 5px;
   font-size: 12px;
-  margin: 2px -4px 0.7em;
-  padding: 3px 4px 2px;
+  margin: 2px -7px 0.7em;
+  padding: 3px 6px 2px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
@@ -239,7 +236,7 @@ ol, ul {
 /* -- Pagination ------------------------------------------------------------ */
 .pg {
   line-height: 1.1em;
-  margin: 2em 0 2em 12px;
+  margin: 2em 0 2em 10px;
 }
 
 .pg:after {

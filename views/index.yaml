@@ -32,16 +32,6 @@ twitter:
     </div>
 
 web:
-  info: >
-    {.section info}
-      <p>
-      Results <strong>{first} - {last}</strong> of about <strong>{total}</strong>
-      for <strong>{query|html}</strong>
-      </p>
-    {.or}
-      <p>No results found.</p>
-    {.end}
-
   pagination: >
     <div class="pg">
       <h2 class="ol">Pagination</h2>

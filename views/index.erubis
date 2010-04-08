@@ -11,7 +11,6 @@
 <div class="loading" id="doc">
   <div id="hd">
     <%= erubis(:'partial/searchbox') %>
-    <div class="info" role="status"><p class="loading">Loading...</p></div>
   </div>
 
   <div id="bd">

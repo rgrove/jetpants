@@ -42,7 +42,6 @@ TEMPLATES     = 'templates',
 
 // Selectors.
 SELECTOR_FIRST_WEB_RESULT = '#results .web a',
-SELECTOR_INFO             = '#hd .info',
 SELECTOR_SEARCH_FORM      = 'form.sf',
 SELECTOR_SEARCH_QUERY     = SELECTOR_SEARCH_FORM + ' input.q',
 SELECTOR_RESULTS          = '#results',
@@ -321,27 +320,6 @@ Y.extend(Search, Y.Widget, {
     });
   },
 
-  _renderInfo: function (parent) {
-    var parentNode = Y.one(parent),
-        results    = this.get(RESULTS + '.web'),
-        template   = this.get(TEMPLATES + '.web.info');
-
-    parentNode.get('children').remove();
-
-    if (!results) {
-      return;
-    }
-
-    parentNode.append(template.expand({
-      info: !results.count ? false : {
-        first: results.start + 1,
-        last : results.start + results.count,
-        total: this._formatNumber(results.deephits),
-        query: this.get(QUERY)
-      }
-    }));
-  },
-
   _renderPagination: function (parent) {
     var currentPage = 1,
         i,
@@ -569,7 +547,6 @@ Y.extend(Search, Y.Widget, {
 
     resultsNode.get('children').remove();
 
-    this._renderInfo(SELECTOR_INFO);
     this._renderTwitterResults(resultsNode);
     this._renderWebResults(resultsNode);
     this._renderPagination(resultsNode);
@@ -639,7 +616,7 @@ Node.DOM_EVENTS.propertychange = 1;
 
 }, '1.0.0', {
     requires: [
-      'datatype-number', 'event', 'event-custom', 'gallery-history-lite',
-      'io-base', 'json-parse', 'node', 'widget'
+      'event', 'event-custom', 'gallery-history-lite', 'io-base', 'json-parse',
+      'node', 'widget'
     ]
 });
