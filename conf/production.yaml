@@ -4,3 +4,18 @@ resources:
   jetpants-search:
     css: http://cdn.jetpants.com/css/jetpants-search-201004062135.css
     js: http://cdn.jetpants.com/js/jetpants-search-201004052220.js
+
+# -- Providers -----------------------------------------------------------------
+providers:
+  boss: &boss
+    enabled: true
+    url: http://boss.yahooapis.com/ysearch
+    version: v1
+
+  twitter:
+    enabled: true
+    url: http://search.twitter.com/search.json
+
+  web:
+    <<: *boss
+    timeout: 2000

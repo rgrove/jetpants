@@ -2,16 +2,13 @@
 require 'uri'
 
 class Jetpants::Provider::Twitter < Jetpants::Provider
-  API_BASE = 'http://search.twitter.com/search.json'
-
   def initialize(options = {})
     super(options)
 
-    # See http://apiwiki.twitter.com/Twitter-Search-API-Method:-search for
-    # options supported by the Twitter Search API.
-
     raise ArgumentError, 'Missing query' unless @options[:query]
 
+    # See http://apiwiki.twitter.com/Twitter-Search-API-Method:-search for
+    # params supported by the Twitter Search API.
     @options[:params]               ||= {}
     @options[:params][:lang]        ||= 'en'
     @options[:params][:q]           ||= @options[:query]
@@ -49,7 +46,8 @@ class Jetpants::Provider::Twitter < Jetpants::Provider
   end
 
   def url
-    "#{API_BASE}?#{build_query(@options[:params])}"
+    return nil unless @config['enabled']
+    "#{@config['url']}?#{build_query(@options[:params])}"
   end
 
   private

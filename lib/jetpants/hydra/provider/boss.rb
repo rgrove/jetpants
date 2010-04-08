@@ -2,9 +2,7 @@
 class Jetpants::Provider::BOSS < Jetpants::Provider
   autoload :Web, 'jetpants/hydra/provider/boss/web'
 
-  API_BASE    = 'http://boss.yahooapis.com/ysearch'
-  API_VERSION = :v1
-  APP_ID      = ENV['JETPANTS_BOSS_APPID'] || nil
+  APP_ID = ENV['JETPANTS_BOSS_APPID'] || nil
 
   def initialize(options = {})
     super(options)
@@ -35,7 +33,9 @@ class Jetpants::Provider::BOSS < Jetpants::Provider
   end
 
   def url
-    "#{API_BASE}/#{@options[:vertical]}/#{API_VERSION}/" <<
+    return nil unless @config['enabled']
+
+    "#{@config['url']}/#{@options[:vertical]}/#{@config['version']}/" <<
         "#{escape(@options[:query])}?#{build_query(@options[:params])}"
   end
 end

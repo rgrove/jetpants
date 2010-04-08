@@ -26,14 +26,16 @@ class Jetpants; class Provider
     :user_agent      => ENV['JETPANTS_HYDRA_USER_AGENT'] || 'Jetpants-Hydra/1.0 (+http://jetpants.com)'
   }
 
-  attr_reader :options, :request_options
+  attr_reader :config, :options, :request_options
 
   # Initializes a new Provider with the specified Provider-specific options.
   def initialize(options = {})
+    @config             = Jetpants::Config.providers[self.class.name.split('::')[-1].downcase] || {}
     @options            = options
     @options[:params] ||= {}
 
     @request_options = DEFAULT_REQUEST_OPTIONS.dup
+    @request_options[:timeout] = @config['timeout'] if @config['timeout']
   end
 
   # Receives a raw Typhoeus::Response object after a request has finished, and
@@ -44,7 +46,7 @@ class Jetpants; class Provider
     # Raise on HTTP error codes. A response code of 0 means that the request
     # timed out, which we don't raise for.
     case response.code.to_i
-    when 200 then
+    when 200
       response
 
     when 0
