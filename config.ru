@@ -11,8 +11,7 @@ map '/api' do
   run Jetpants::Api
 end
 
-unless ENV['RACK_ENV'] == 'production'
-  $LOAD_PATH.unshift('../weld/lib')
+if Jetpants::RACK_ENV == :development
   require 'weld'
 
   Weld::Server.set(:config_file, File.join(Jetpants::CONFIG_DIR, 'weld.yaml'))

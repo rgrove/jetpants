@@ -1,10 +1,8 @@
-require 'erubis'
 require 'lilypad'
 require 'sinatra/base'
 require 'yajl'
 
 class Jetpants::Base < Sinatra::Base
-  set :config,  File.exist?(Jetpants::CONFIG_FILE) ? YAML.load_file(Jetpants::CONFIG_FILE) : {}
   set :logging, true
   set :root,    Jetpants::ROOT_DIR
 

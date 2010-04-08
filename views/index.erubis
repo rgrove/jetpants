@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <title>Jetpants Search</title>
-  <link rel="stylesheet" type="text/css" href="<%== @config['resources']['jetpants-search']['css'] %>">
+  <link rel="stylesheet" type="text/css" href="<%== @resources['jetpants-search']['css'] %>">
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Jetpants">
 </head>
 <body role="document">
@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<script src="<%== @config['resources']['jetpants-search']['js'] %>"></script>
+<script src="<%== @resources['jetpants-search']['js'] %>"></script>
 <script>
   var Y = YUI({fetchCSS:false, bootstrap: false}).use('jetpants-search', function (Y) {
     (new Y.Jetpants.Search({

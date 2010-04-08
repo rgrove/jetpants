@@ -9,7 +9,7 @@ class Jetpants::Web < Jetpants::Base
     content_type('text/html', :charset => 'utf-8')
     cache_control(:public, :max_age => 1800)
 
-    @config    = settings.config
+    @resources = Jetpants::Config['resources']
     @templates = json_templates(:index)
 
     erubis(:index)
