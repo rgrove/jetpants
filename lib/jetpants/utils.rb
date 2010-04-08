@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class Jetpants; module Utils
   REGEX_URL_HOST = %r{^https?://([^/]+)}
 

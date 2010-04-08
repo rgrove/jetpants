@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # TODO: Implement support for Retry-After in API responses
 require 'uri'
 

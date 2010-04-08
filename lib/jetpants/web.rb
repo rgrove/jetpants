@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class Jetpants::Web < Jetpants::Base
   get '/' do
     # Convert all query parameters into hash parameters and redirect.

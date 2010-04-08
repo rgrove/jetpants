@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class Jetpants::Config; class << self
   # Adds the specified config Hash to the config lookup chain. Any configuration
   # values in _config_ will be used as defaults unless they're specified earlier

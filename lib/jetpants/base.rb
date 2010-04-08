@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'lilypad'
 require 'sinatra/base'
 require 'yajl'

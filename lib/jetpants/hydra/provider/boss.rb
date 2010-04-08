@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Generic BOSS provider.
 class Jetpants::Provider::BOSS < Jetpants::Provider
   autoload :Web, 'jetpants/hydra/provider/boss/web'

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class Jetpants::Provider::BOSS::Web < Jetpants::Provider::BOSS
   def initialize(options = {})
     super(options.merge({:vertical => :web}))

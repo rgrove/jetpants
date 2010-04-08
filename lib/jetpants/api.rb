@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'jetpants/hydra'
 
 class Jetpants::Api < Jetpants::Base
