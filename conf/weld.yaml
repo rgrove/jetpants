@@ -3,7 +3,7 @@ cdn:
   type: s3
   options:
     # access_key_id: 'abc'
-    # secred_access_key: '123'
+    # secret_access_key: '123'
 
     bucket: cdn.jetpants.com
 
@@ -22,9 +22,14 @@ compressors:
       jar: /Users/rgrove/Library/Java/Extensions/yuicompressor.jar
 
   js:
-    name: yui
+    name: closure
     options:
-      jar: /Users/rgrove/Library/Java/Extensions/yuicompressor.jar
+      jar: /Users/rgrove/Library/Java/Extensions/compiler.jar
+
+  # js:
+  #   name: yui
+  #   options:
+  #     jar: /Users/rgrove/Library/Java/Extensions/yuicompressor.jar
 
 sourcePaths:
   - ../public/js
