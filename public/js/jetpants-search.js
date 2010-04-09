@@ -18,15 +18,18 @@ function Search(config) {
 }
 
 // -- Shorthand ----------------------------------------------------------------
-var doc       = Y.config.doc,
-    win       = Y.config.win,
-    Array     = Y.Array,
-    Attribute = Y.Attribute,
-    DOM       = Y.DOM,
-    History   = Y.HistoryLite,
-    Lang      = Y.Lang,
-    Node      = Y.Node,
-    UI        = Y.Widget.UI_SRC,
+var doc = Y.config.doc,
+    win = Y.config.win,
+
+Array     = Y.Array,
+Attribute = Y.Attribute,
+DOM       = Y.DOM,
+History   = Y.HistoryLite,
+Lang      = Y.Lang,
+Node      = Y.Node,
+
+ATTRS = {},
+UI    = 'ui',
 
 // Attribute names.
 API_URL       = 'apiUrl',
@@ -41,6 +44,7 @@ SEARCH_FORMS  = 'searchForms',
 TEMPLATES     = 'templates',
 
 // Selectors.
+SELECTOR_CONTENT_BOX      = '#doc',
 SELECTOR_FIRST_WEB_RESULT = '#results .web a',
 SELECTOR_SEARCH_FORM      = 'form.sf',
 SELECTOR_SEARCH_QUERY     = SELECTOR_SEARCH_FORM + ' input.q',
@@ -72,156 +76,169 @@ EVT_SEARCH_SUCCESS = 'searchSuccess';
 
 // -- Static Properties --------------------------------------------------------
 Search.NAME  = 'search';
+Search.ATTRS = ATTRS;
 
-Search.ATTRS = {
-  /**
-   * URL of the Jetpants Search API.
-   *
-   * @attribute apiUrl
-   * @type String
-   */
-  apiUrl: {value: '/api/search'},
+// -- Attributes ---------------------------------------------------------------
+/**
+ * URL of the Jetpants Search API.
+ *
+ * @attribute apiUrl
+ * @type String
+ */
+ATTRS[API_URL] = {
+  value: '/api/search'
+};
 
-  /**
-   * Current query in the search box, which may or may not have been submitted
-   * yet (thus "pending").
-   *
-   * @attribute pendingQuery
-   * @type String
-   */
-  pendingQuery: {
-    setter: function (value) {
-      return Lang.trim(value) || '';
-    },
+/**
+ * Content box for the page.
+ *
+ * @attribute contentBox
+ * @type String|HTMLElement|Node
+ */
+ATTRS[CONTENT_BOX] = {
+  setter   : Y.one,
+  writeOnce: true
+};
 
-    valueFn: function () {
-      return this.get(CONTENT_BOX).one(SELECTOR_SEARCH_QUERY).get('value');
-    }
+/**
+ * Current query in the search box, which may or may not have been submitted
+ * yet (thus "pending").
+ *
+ * @attribute pendingQuery
+ * @type String
+ */
+ATTRS[PENDING_QUERY] = {
+  setter: function (value) {
+    return Lang.trim(value) || '';
   },
 
-  /**
-   * Currently active search query from the page URL, or <code>null</code> if
-   * there isn't one.
-   *
-   * @attribute query
-   * @type String|null
-   */
-  query: {
-    readOnly: true,
-    valueFn : function () {
-      return Lang.trim(History.get('q')) || null;
-    }
-  },
-
-  /**
-   * NodeList containing all search input boxes on the page.
-   *
-   * @attribute queryNodes
-   * @type NodeList
-   * @final
-   */
-  queryNodes: {
-    readOnly: true,
-    valueFn : function () {
-      return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_QUERY);
-    }
-  },
-
-  /**
-   * Number of web results to return for a search.
-   *
-   * @attribute resultCount
-   * @type Number
-   * @default 10
-   */
-  resultCount: {
-    setter: function (value) {
-      value = parseInt(value, 10);
-
-      if (isNaN(value) || value < 1 || value > 100) {
-        return Attribute.INVALID_VALUE;
-      }
-    },
-
-    valueFn: function () {
-      return +(History.get('count') || 10);
-    }
-  },
-
-  /**
-   * 0-based result offset to use when requesting search results.
-   *
-   * @attribute resultStart
-   * @type Number
-   * @default 0
-   */
-  resultStart: {
-    setter: function (value) {
-      value = parseInt(value, 10);
-
-      if (isNaN(value) || value < 0 || value > 999) {
-        return Attribute.INVALID_VALUE;
-      }
-    },
-
-    valueFn: function () {
-      return +(History.get('start') || 0);
-    }
-  },
-
-  /**
-   * Results of the most recent search request, if any.
-   *
-   * @attribute results
-   * @type Object
-   * @final
-   */
-  results: {
-    readOnly: true,
-    value   : {}
-  },
-
-  /**
-   * NodeList containing all search forms on the page.
-   *
-   * @attribute searchForms
-   * @type NodeList
-   * @final
-   */
-  searchForms: {
-    readOnly: true,
-    valueFn : function () {
-      return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_FORM);
-    }
-  },
-
-  /**
-   * Compiled JSON templates.
-   *
-   * @attribute templates
-   * @type Object
-   */
-  templates: {
-    readOnly: true,
-    value: {}
+  valueFn: function () {
+    return this.get(CONTENT_BOX).one(SELECTOR_SEARCH_QUERY).get('value');
   }
 };
 
-Y.extend(Search, Y.Widget, {
+/**
+ * Currently active search query from the page URL, or <code>null</code> if
+ * there isn't one.
+ *
+ * @attribute query
+ * @type String|null
+ */
+ATTRS[QUERY] = {
+  readOnly: true,
+  valueFn : function () {
+    return Lang.trim(History.get('q')) || null;
+  }
+};
 
+/**
+ * NodeList containing all search input boxes on the page.
+ *
+ * @attribute queryNodes
+ * @type NodeList
+ * @final
+ */
+ATTRS[QUERY_NODES] = {
+  readOnly: true,
+  valueFn : function () {
+    return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_QUERY);
+  }
+};
+
+/**
+ * Number of web results to return for a search.
+ *
+ * @attribute resultCount
+ * @type Number
+ * @default 10
+ */
+ATTRS[RESULT_COUNT] = {
+  setter: function (value) {
+    value = parseInt(value, 10);
+
+    if (isNaN(value) || value < 1 || value > 100) {
+      return Attribute.INVALID_VALUE;
+    }
+  },
+
+  valueFn: function () {
+    return +(History.get('count') || 10);
+  }
+};
+
+/**
+ * 0-based result offset to use when requesting search results.
+ *
+ * @attribute resultStart
+ * @type Number
+ * @default 0
+ */
+ATTRS[RESULT_START] = {
+  setter: function (value) {
+    value = parseInt(value, 10);
+
+    if (isNaN(value) || value < 0 || value > 999) {
+      return Attribute.INVALID_VALUE;
+    }
+  },
+
+  valueFn: function () {
+    return +(History.get('start') || 0);
+  }
+};
+
+/**
+ * Results of the most recent search request, if any.
+ *
+ * @attribute results
+ * @type Object
+ * @final
+ */
+ATTRS[RESULTS] = {
+  readOnly: true,
+  value   : {}
+};
+
+/**
+ * NodeList containing all search forms on the page.
+ *
+ * @attribute searchForms
+ * @type NodeList
+ * @final
+ */
+ATTRS[SEARCH_FORMS] = {
+  readOnly: true,
+  valueFn : function () {
+    return this.get(CONTENT_BOX).all(SELECTOR_SEARCH_FORM);
+  }
+};
+
+/**
+ * Compiled JSON templates.
+ *
+ * @attribute templates
+ * @type Object
+ */
+ATTRS[TEMPLATES] = {
+  readOnly: true,
+  value: {}
+};
+
+Y.extend(Search, Y.Base, {
   // -- Public Instance Methods ------------------------------------------------
   initializer: function (config) {
     this.publish(EVT_SEARCH,         {defaultFn: this._defSearchFn});
     this.publish(EVT_SEARCH_FAILURE, {defaultFn: this._defSearchFailureFn});
     this.publish(EVT_SEARCH_SUCCESS, {defaultFn: this._defSearchSuccessFn});
 
-    Y.after('history-lite:change', this._afterHistoryChange, this);
+    this._render();
+    this._attachEvents();
   },
 
-  // destructor: function () {
-  // },
+  // -- Protected Methods ------------------------------------------------------
+  _attachEvents: function () {
+    Y.after('history-lite:change', this._afterHistoryChange, this);
 
-  bindUI: function () {
     this.after('pendingQueryChange', this._afterPendingQueryChange);
     this.after('queryChange', this._afterQueryChange);
     this.after('resultsChange', this._afterResultsChange);
@@ -240,7 +257,30 @@ Y.extend(Search, Y.Widget, {
     }
   },
 
-  renderUI: function () {
+  _buildQueryString: function (params) {
+    var _params = [],
+        encode  = encodeURIComponent;
+
+    Y.each(params, function (value, name) {
+        _params.push(encode(name) + '=' + encode(value));
+    });
+
+    return _params.join('&');
+  },
+
+  _compileTemplates: function (templates) {
+    if (Lang.isObject(templates)) {
+      Y.Object.each(templates, function (value, name) {
+        templates[name] = this._compileTemplates(value);
+      }, this);
+
+      return templates;
+    } else {
+      return jsontemplate.Template(templates);
+    }
+  },
+
+  _render: function () {
     var agents     = ['chrome', 'gecko', 'ie', 'mobile', 'opera', 'webkit'],
         autoFocus  = true,
         query      = this.get(QUERY),
@@ -267,6 +307,8 @@ Y.extend(Search, Y.Widget, {
       this.fire(EVT_SEARCH, {query: query});
     }
 
+    this.get(QUERY_NODES).set('value', this.get(QUERY) || '');
+
     // Remove the .loading class from the contentBox now that we're done
     // rendering the initial page state.
     this.get(CONTENT_BOX).removeClass('loading');
@@ -274,41 +316,6 @@ Y.extend(Search, Y.Widget, {
     if (autoFocus) {
       this.get(QUERY_NODES).item(0).focus();
     }
-  },
-
-  syncUI: function () {
-    this.get(QUERY_NODES).set('value', this.get(QUERY) || '');
-  },
-
-  // -- Protected Methods ------------------------------------------------------
-
-  _buildQueryString: function (params) {
-    var _params = [],
-        encode  = encodeURIComponent;
-
-    Y.each(params, function (value, name) {
-        _params.push(encode(name) + '=' + encode(value));
-    });
-
-    return _params.join('&');
-  },
-
-  _compileTemplates: function (templates) {
-    if (Lang.isObject(templates)) {
-      Y.Object.each(templates, function (value, name) {
-        templates[name] = this._compileTemplates(value);
-      }, this);
-
-      return templates;
-    } else {
-      return jsontemplate.Template(templates);
-    }
-  },
-
-  _formatNumber: function (number) {
-    return Y.DataType.Number.format(number, {
-      thousandsSeparator: ','
-    });
   },
 
   _renderImageResults: function (parent) {
@@ -620,15 +627,15 @@ Y.extend(Search, Y.Widget, {
   }
 });
 
-Y.namespace('Jetpants').Search = Search;
-
 // TODO: need to file a bug to get these added to YUI.
 Node.DOM_EVENTS.input = 1;
 Node.DOM_EVENTS.propertychange = 1;
 
+Y.namespace('Jetpants').Search = new Search({contentBox: SELECTOR_CONTENT_BOX});
+
 }, '1.0.0', {
     requires: [
-      'event', 'event-custom', 'gallery-history-lite', 'io-base', 'json-parse',
-      'node', 'widget'
+      'base', 'event', 'event-custom', 'gallery-history-lite', 'io-base',
+      'json-parse', 'node'
     ]
 });
