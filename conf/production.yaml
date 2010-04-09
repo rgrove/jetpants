@@ -12,6 +12,10 @@ providers:
     url: http://boss.yahooapis.com/ysearch
     version: v1
 
+  images:
+    <<: *boss
+    enabled: false
+
   twitter:
     enabled: true
     url: http://search.twitter.com/search.json

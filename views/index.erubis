@@ -14,7 +14,10 @@
   </div>
 
   <div id="bd">
-    <div id="results" role="main"></div>
+    <div id="results">
+      <div class="left" role="main"></div>
+      <div class="right"></div>
+    </div>
   </div>
 
   <div id="ft" role="contentinfo">

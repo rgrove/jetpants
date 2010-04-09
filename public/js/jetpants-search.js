@@ -45,6 +45,8 @@ SELECTOR_FIRST_WEB_RESULT = '#results .web a',
 SELECTOR_SEARCH_FORM      = 'form.sf',
 SELECTOR_SEARCH_QUERY     = SELECTOR_SEARCH_FORM + ' input.q',
 SELECTOR_RESULTS          = '#results',
+SELECTOR_RESULTS_LEFT     = SELECTOR_RESULTS + ' .left',
+SELECTOR_RESULTS_RIGHT    = SELECTOR_RESULTS + ' .right',
 
 // -- Public Events ------------------------------------------------------------
 
@@ -309,6 +311,17 @@ Y.extend(Search, Y.Widget, {
     });
   },
 
+  _renderImageResults: function (parent) {
+    var results  = this.get(RESULTS + '.images'),
+        template = this.get(TEMPLATES + '.images');
+
+    if (!results || !results.results || !results.results.length) {
+      return;
+    }
+
+    Y.one(parent).append(template.expand(results));
+  },
+
   _renderPagination: function (parent) {
     var currentPage = 1,
         i,
@@ -532,19 +545,23 @@ Y.extend(Search, Y.Widget, {
    * @protected
    */
   _afterResultsChange: function (e) {
-    var results     = e.newVal,
-        resultsNode = Y.one(SELECTOR_RESULTS);
+    var results      = e.newVal,
+        resultsLeft  = Y.one(SELECTOR_RESULTS_LEFT),
+        resultsRight = Y.one(SELECTOR_RESULTS_RIGHT);
 
     // Extract JSON templates from the response and compile them.
     if (results.templates) {
       this._set('templates', this._compileTemplates(results.templates));
     }
 
-    resultsNode.get('children').remove();
+    resultsLeft.get('children').remove();
+    resultsRight.get('children').remove();
 
-    this._renderTwitterResults(resultsNode);
-    this._renderWebResults(resultsNode);
-    this._renderPagination(resultsNode);
+    this._renderTwitterResults(resultsLeft);
+    this._renderWebResults(resultsLeft);
+    this._renderPagination(resultsLeft);
+
+    this._renderImageResults(resultsRight);
   },
 
   /**

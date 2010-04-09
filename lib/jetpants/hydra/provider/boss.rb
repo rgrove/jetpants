@@ -2,7 +2,8 @@
 
 # Generic BOSS provider.
 class Jetpants::Provider::BOSS < Jetpants::Provider
-  autoload :Web, 'jetpants/hydra/provider/boss/web'
+  autoload :Images, 'jetpants/hydra/provider/boss/images'
+  autoload :Web,    'jetpants/hydra/provider/boss/web'
 
   APP_ID = ENV['JETPANTS_BOSS_APPID'] || nil
 
@@ -12,9 +13,6 @@ class Jetpants::Provider::BOSS < Jetpants::Provider
     raise ArgumentError, 'Missing BOSS app id' unless @options[:params][:appid] ||= APP_ID
     raise ArgumentError, 'Missing query' unless @options[:query]
     raise ArgumentError, 'Missing BOSS vertical' unless @options[:vertical]
-
-    @options[:params][:count] ||= @options[:count] if @options.has_key?(:count)
-    @options[:params][:start] ||= @options[:start] if @options.has_key?(:start)
   end
 
   def extract(response)

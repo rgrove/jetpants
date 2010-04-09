@@ -29,15 +29,25 @@ class Jetpants::Api < Jetpants::Base
     def search(query, count = 10, start = 0)
       hydra = Jetpants::Hydra.new(
         :web => Jetpants::Provider::BOSS::Web.new(
-          :query => query,
-          :count => count,
-          :start => start
+          :query  => query,
+          :params => {
+            :count => count,
+            :start => start
+          }
         )
       )
 
-      # Only request Twitter results for the first page.
+      # Only hit these backends for the first page.
       if start < count
         hydra.add(
+          :images => Jetpants::Provider::BOSS::Images.new(
+            :query  => query,
+            :params => {
+              :count      => 4,
+              :dimensions => 'medium,large,wallpaper'
+            }
+          ),
+
           :twitter => Jetpants::Provider::Twitter.new(
             :query  => query,
             :params => {
@@ -47,15 +57,20 @@ class Jetpants::Api < Jetpants::Base
         )
       end
 
-      results = hydra.run
+      select_templates(hydra.run)
+    end
 
-      # Add templates.
+    def select_templates(results)
       results[:templates] = {
         :web => {
           :pagination => erubis(:'common/pagination'),
           :results    => erubis(:'results/web')
         }
       }
+
+      if results[:images]
+        results[:templates][:images] = erubis(:'results/shortcuts/images')
+      end
 
       if results[:twitter]
         results[:templates][:twitter] = erubis(:'results/shortcuts/twitter')

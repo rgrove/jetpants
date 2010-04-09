@@ -3,9 +3,7 @@
 class Jetpants::Provider::BOSS::Web < Jetpants::Provider::BOSS
   def initialize(options = {})
     super(options.merge({:vertical => :web}))
-
     @options[:params][:view] ||= 'delicious_saves'
-    @request_options[:timeout] = 1000
   end
 
   def extract(response)

@@ -132,6 +132,27 @@ ol, ul {
 
 .entry #bd { display: none; }
 
+#results { position: relative; }
+
+#results:after {
+  clear: left;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+#results > .left {
+  float: left;
+  width: 600px;
+}
+
+#results > .right {
+  left: 600px;
+  margin: 0 0 0 10px;
+  position: absolute;
+}
+
 /* -- Web Results ----------------------------------------------------------- */
 .web {
   font-size: 13px;
@@ -176,6 +197,7 @@ ol, ul {
 
 /* -- Shortcut Styles ------------------------------------------------------- */
 .sc {
+  background: #fff;
   border-radius: 5px;
   box-shadow: 0 0 4px #b2b2b2;
   font-size: 11px;
@@ -189,6 +211,8 @@ ol, ul {
   -webkit-border-radius: 5px;
   -webkit-box-shadow: 0 0 4px #b2b2b2;
 }
+
+.right .sc { width: 250px; }
 
 .ie .sc,
 .opera .sc {
@@ -208,6 +232,38 @@ ol, ul {
 }
 
 .sc .ft p { margin-bottom: 8px; }
+
+/* -- Images Shortcut ------------------------------------------------------- */
+.images a {
+  float: left;
+  height: 90px;
+/*  line-height: 90px;*/
+  margin: 0 6px 15px;
+  text-align: center;
+  width: 110px;
+}
+
+.images img {
+  border: 1px solid #dfdfdf;
+  max-height: 90px;
+  max-width: 110px;
+  padding: 2px;
+  vertical-align: middle;
+}
+
+.images a:hover img { border-color: #7fa1ff; }
+
+.images .bd {
+  padding: 6px 0;
+}
+
+.images .bd:after {
+  clear: left;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
 
 /* -- Twitter Shortcut ------------------------------------------------------ */
 .twitter li { margin-bottom: 0.7em; }

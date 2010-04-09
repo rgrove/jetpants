@@ -1,0 +1,18 @@
+<div class="sc images jsont" role="complementary">
+  <div class="hd">
+    <h2>Image Results</h2>
+  </div>
+  <div class="bd">
+    {.section results}
+      <ul>
+        {.repeated section @}
+          <li>
+            <a href="{referrerclickurl}">
+              <img src="{thumbnail_url}" alt="{title|html-attr-value}">
+            </a>
+          </li>
+        {.end}
+      </ul>
+    {.end}
+  </div>
+</div>
