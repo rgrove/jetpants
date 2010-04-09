@@ -77,7 +77,6 @@ components:
       - json-template
       - yui-3.1.0-core
       - yui-3.1.0-base
-      - yui-3.1.0-widget
 
     css:
       - jetpants-search.css
