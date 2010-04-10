@@ -303,6 +303,7 @@ Y.extend(Search, Y.Base, {
     // page and fire a search event.
     if (query) {
       autoFocus = false;
+      this._set(PENDING_QUERY, query);
       root.removeClass('entry');
       this.fire(EVT_SEARCH, {query: query});
     }
