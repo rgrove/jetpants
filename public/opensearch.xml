@@ -6,8 +6,8 @@
   <!-- <Image height="16" width="16" type="image/png"></Image> -->
   <Tags>search web twitter real-time</Tags>
   <Contact>ryan@wonko.com</Contact>
-  <Url type="text/html" method="GET" template="http://jetpants.heroku.com/#q={searchTerms}" />
+  <Url type="text/html" method="GET" template="http://jetpants.com/#q={searchTerms}" />
   <Query role="example" searchTerms="ninjas" />
   <Developer>Ryan Grove</Developer>
-  <moz:SearchForm>http://jetpants.heroku.com/</moz:SearchForm>
+  <moz:SearchForm>http://jetpants.com/</moz:SearchForm>
 </OpenSearchDescription>
