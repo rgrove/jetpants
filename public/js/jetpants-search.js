@@ -11,7 +11,7 @@ YUI.add('jetpants-search', function (Y) {
 
 /**
  * @class Search
- * @static
+ * @constructor
  */
 function Search(config) {
   Search.superclass.constructor.apply(this, arguments);
@@ -32,16 +32,16 @@ ATTRS = {},
 UI    = 'ui',
 
 // Attribute names.
-API_URL       = 'apiUrl',
-CONTENT_BOX   = 'contentBox',
-PENDING_QUERY = 'pendingQuery',
-QUERY         = 'query',
-QUERY_NODES   = 'queryNodes',
-RESULT_COUNT  = 'resultCount',
-RESULT_START  = 'resultStart',
-RESULTS       = 'results',
-SEARCH_FORMS  = 'searchForms',
-TEMPLATES     = 'templates',
+API_URL        = 'apiUrl',
+CONTENT_BOX    = 'contentBox',
+PENDING_QUERY  = 'pendingQuery',
+QUERY          = 'query',
+QUERY_NODES    = 'queryNodes',
+RESULT_COUNT   = 'resultCount',
+RESULT_START   = 'resultStart',
+RESULTS        = 'results',
+SEARCH_FORMS   = 'searchForms',
+TEMPLATES      = 'templates',
 
 // Selectors.
 SELECTOR_CONTENT_BOX      = '#doc',
@@ -79,6 +79,7 @@ Search.NAME  = 'search';
 Search.ATTRS = ATTRS;
 
 // -- Attributes ---------------------------------------------------------------
+
 /**
  * URL of the Jetpants Search API.
  *
@@ -231,8 +232,30 @@ Y.extend(Search, Y.Base, {
     this.publish(EVT_SEARCH_FAILURE, {defaultFn: this._defSearchFailureFn});
     this.publish(EVT_SEARCH_SUCCESS, {defaultFn: this._defSearchSuccessFn});
 
+    this._activeModules = {};
+    this._resultModules = {};
+
     this._render();
     this._attachEvents();
+  },
+
+  addResultModule: function (name, module) {
+    this._resultModules[name] = module;
+  },
+
+  addShortcutModule: function (name, module) {
+    this.addResultModule(name, module);
+  },
+
+  buildQueryString: function (params) {
+    var _params = [],
+        encode  = encodeURIComponent;
+
+    Y.each(params, function (value, name) {
+        _params.push(encode(name) + '=' + encode(value));
+    });
+
+    return _params.join('&');
   },
 
   // -- Protected Methods ------------------------------------------------------
@@ -255,17 +278,6 @@ Y.extend(Search, Y.Base, {
     } else {
       this.get(QUERY_NODES).after('input', this._afterQueryInput, this);
     }
-  },
-
-  _buildQueryString: function (params) {
-    var _params = [],
-        encode  = encodeURIComponent;
-
-    Y.each(params, function (value, name) {
-        _params.push(encode(name) + '=' + encode(value));
-    });
-
-    return _params.join('&');
   },
 
   _compileTemplates: function (templates) {
@@ -319,114 +331,16 @@ Y.extend(Search, Y.Base, {
     }
   },
 
-  _renderImageResults: function (parent) {
-    var results  = this.get(RESULTS + '.images'),
-        template = this.get(TEMPLATES + '.images');
-
-    if (!results || !results.results || !results.results.length) {
-      return;
-    }
-
-    Y.one(parent).append(template.expand(results));
-  },
-
-  _renderPagination: function (parent) {
-    var currentPage = 1,
-        i,
-        pagination,
-        pages       = [],
-        queryParams,
-        results     = this.get(RESULTS + '.web'),
-        resultCount = this.get(RESULT_COUNT),
-        resultStart = this.get(RESULT_START),
-        template    = this.get(TEMPLATES + '.web.pagination'),
-        that        = this,
-        totalPages  = 1,
-        windowEnd,
-        windowStart;
-
-    if (!results) {
-      return;
-    }
-
-    if (results.totalhits) {
-      totalPages  = Math.min(100, Math.ceil(results.totalhits / resultCount));
-      currentPage = Math.ceil((resultStart + 1) / resultCount);
-    }
-
-    if (totalPages === 1) {
-      return;
-    }
-
-    queryParams = {
-      q    : this.get(QUERY)
-      // count: resultCount // No need to send count yet, since there's no way to customize it
-    };
-
-    windowStart = Math.max(1, currentPage - 5);
-    windowEnd   = Math.min(windowStart + 9, totalPages);
-
-    for (i = windowStart; i <= windowEnd; ++i) {
-      pages.push({
-        current    : i === currentPage,
-        page       : i,
-        queryString: this._buildQueryString(Y.merge(queryParams, {
-          start: (i - 1) * resultCount
-        }))
-      });
-    }
-
-    pagination = {
-      next: (function () {
-        if (windowEnd > currentPage) {
-          return {
-            queryString: that._buildQueryString(Y.merge(queryParams, {
-              start: currentPage * resultCount
-            }))
-          };
-        }
-      }()),
-
-      pages: pages,
-
-      prev: (function () {
-        if (currentPage > 1) {
-          return {
-            queryString: that._buildQueryString(Y.merge(queryParams, {
-              start: ((currentPage - 2) * resultCount)
-            }))
-          };
-        }
-      }())
-    };
-
-    Y.one(parent).append(template.expand(pagination));
-  },
-
-  _renderTwitterResults: function (parent) {
-    var results  = this.get(RESULTS + '.twitter'),
-        template = this.get(TEMPLATES + '.twitter');
-
-    if (!results || !results.results || !results.results.length) {
-      return;
-    }
-
-    Y.one(parent).append(template.expand(results));
-  },
-
-  _renderWebResults: function (parent) {
-    var results  = this.get(RESULTS + '.web'),
-        template = this.get(TEMPLATES + '.web.results');
-
-    if (!results) {
-      return;
-    }
-
-    results.query = this.get(QUERY);
-    results.start = this.get(RESULT_START) + 1;
-
-    Y.one(parent).append(template.expand(results));
-  },
+  // _renderImageResults: function (parent) {
+  //   var results  = this.get(RESULTS + '.images'),
+  //       template = this.get(TEMPLATES + '.images');
+  // 
+  //   if (!results || !results.results || !results.results.length) {
+  //     return;
+  //   }
+  // 
+  //   Y.one(parent).append(template.expand(results));
+  // },
 
   _search: function () {
     var config = this.getAttrs([QUERY, RESULT_COUNT, RESULT_START]),
@@ -450,7 +364,7 @@ Y.extend(Search, Y.Base, {
 
     this._request = Y.io(this.get(API_URL), {
       context: this,
-      data   : this._buildQueryString(params),
+      data   : this.buildQueryString(params),
       timeout: 15000,
 
       on: {
@@ -553,23 +467,38 @@ Y.extend(Search, Y.Base, {
    * @protected
    */
   _afterResultsChange: function (e) {
-    var results      = e.newVal,
-        resultsLeft  = Y.one(SELECTOR_RESULTS_LEFT),
-        resultsRight = Y.one(SELECTOR_RESULTS_RIGHT);
+    var results     = e.newVal,
+        resultsLeft = Y.one(SELECTOR_RESULTS_LEFT),
+        templates;
+        // resultsRight = Y.one(SELECTOR_RESULTS_RIGHT);
 
     // Extract JSON templates from the response and compile them.
     if (results.templates) {
-      this._set('templates', this._compileTemplates(results.templates));
+      this._set(TEMPLATES, templates = this._compileTemplates(results.templates));
     }
 
-    resultsLeft.get('children').remove();
-    resultsRight.get('children').remove();
+    Y.Object.each(this._activeModules, function (module, name) {
+      module.destroy();
+      delete this._activeModules[name];
+    }, this);
 
-    this._renderTwitterResults(resultsLeft);
-    this._renderWebResults(resultsLeft);
-    this._renderPagination(resultsLeft);
+    Y.Object.each(results.results, function (results, name) {
+      var Module = this._resultModules[name];
 
-    this._renderImageResults(resultsRight);
+      if (Module) {
+        this._activeModules[name] = new Module({
+          parentNode: resultsLeft,
+          results   : results,
+          templates : (templates || {})[name] || {}
+        });
+      } else {
+        Y.log('No result module registered for ' + name + ' results.');
+      }
+    }, this);
+
+    Y.Object.each(this._activeModules, function (module) {
+      module.render();
+    }, this);
   },
 
   /**
@@ -637,6 +566,6 @@ Y.namespace('Jetpants').Search = new Search({contentBox: SELECTOR_CONTENT_BOX});
 }, '1.0.0', {
     requires: [
       'base', 'event', 'event-custom', 'gallery-history-lite', 'io-base',
-      'json-parse', 'node'
+      'jetpants-result-module', 'json-parse', 'node'
     ]
 });

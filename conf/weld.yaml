@@ -36,12 +36,7 @@ sourcePaths:
   - ../public/css
 
 components:
-
   # -- Third-party dependencies ------------------------------------------------
-  json-template:
-    js:
-      - ext/json-template.js
-
   yui-3.1.0-core:
     js:
       - 'http://yui.yahooapis.com/3.1.0/build/yui/yui-base.js'
@@ -74,7 +69,6 @@ components:
   # -- Jetpants ----------------------------------------------------------------
   jetpants-search:
     requires:
-      - json-template
       - yui-3.1.0-core
       - yui-3.1.0-base
 
@@ -84,5 +78,10 @@ components:
     js:
       - 'http://yui.yahooapis.com/3.1.0/build/io/io-base.js'
       - 'http://yui.yahooapis.com/3.1.0/build/json/json-parse.js'
+      - ext/json-template.js
       - history-lite.js
       - jetpants-search.js
+      - jetpants-result-module.js
+      - jetpants-shortcut-module.js
+      - result-modules/web.js
+      - result-modules/shortcuts/twitter.js

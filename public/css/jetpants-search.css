@@ -291,8 +291,9 @@ ol, ul {
 
 /* -- Pagination ------------------------------------------------------------ */
 .pg {
+  font-size: 12px;
   line-height: 1.1em;
-  margin: 2em 0 2em 10px;
+  margin: 1em 0;
 }
 
 .pg:after {

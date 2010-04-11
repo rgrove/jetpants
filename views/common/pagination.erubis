@@ -1,4 +1,4 @@
-<div class="pg jsont">
+<div class="pg">
   <h2 class="ol">Pagination</h2>
   <ul role="navigation">
     {.section prev}

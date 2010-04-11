@@ -1,24 +1,22 @@
-<div class="web jsont">
-  <h2 class="ol">Web Results</h2>
-  {.section results}
-    <ol start="{start}">
-      {.repeated section @}
-        <li{.section indent} class="indent"{.end}>
-          <h3 class="title"><a href="{url}">{title}</a></h3>
-          {# TODO: Make this a <p>}
-          <div class="abstract">{abstract}</div>
-          <cite>{dispurl}</cite>
-          {.section delicious}{.section saves}
-            <a href="http://delicious.com/url/view?url={url|url-param-value}" class="delicious-saves">Saved {@} times on Delicious</a>
-          {.end}{.end}
-        </li>
-      {.end}
-    </ol>
-  {.or}
-    <h3>Aw snap!</h3>
-    <p>
-      We scoured the vast wastelands of the Intertubes for
-      <strong>{query|html}</strong>, but we couldn't find anything. Sorry.
-    </p>
-  {.end}
-</div>
+<h2 class="ol">Web Results</h2>
+{.section results}
+  <ol start="{start}">
+    {.repeated section @}
+      <li{.section indent} class="indent"{.end}>
+        <h3 class="title"><a href="{url}">{title}</a></h3>
+        {# TODO: Make this a <p>}
+        <div class="abstract">{abstract}</div>
+        <cite>{dispurl}</cite>
+        {.section delicious}{.section saves}
+          <a href="http://delicious.com/url/view?url={url|url-param-value}" class="delicious-saves">Saved {@} times on Delicious</a>
+        {.end}{.end}
+      </li>
+    {.end}
+  </ol>
+{.or}
+  <h3>Aw snap!</h3>
+  <p>
+    We scoured the vast wastelands of the Intertubes for
+    <strong>{query|html}</strong>, but we couldn't find anything. Sorry.
+  </p>
+{.end}

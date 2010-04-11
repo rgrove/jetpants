@@ -57,26 +57,32 @@ class Jetpants::Api < Jetpants::Base
         )
       end
 
-      select_templates(hydra.run)
+      results = {:results => hydra.run}
+
+      results[:results].delete_if do |k, v|
+        !v || v.empty? || !v[:results] || v[:results].empty?
+      end
+
+      select_templates(results)
     end
 
-    def select_templates(results)
-      results[:templates] = {
+    def select_templates(response)
+      results = response[:results] || {}
+
+      templates = response[:templates] = {
         :web => {
           :pagination => erubis(:'common/pagination'),
           :results    => erubis(:'results/web')
         }
       }
 
-      if results[:images]
-        results[:templates][:images] = erubis(:'results/shortcuts/images')
+      [:images, :twitter].each do |shortcut|
+        if results[shortcut]
+          templates[shortcut] = erubis(:"results/shortcuts/#{shortcut}")
+        end
       end
 
-      if results[:twitter]
-        results[:templates][:twitter] = erubis(:'results/shortcuts/twitter')
-      end
-
-      results
+      response
     end
   end
 
