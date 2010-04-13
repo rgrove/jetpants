@@ -45,16 +45,20 @@ components:
       # - 'http://yui.yahooapis.com/3.1.0/build/yui/yui-log.js'
       # - 'http://yui.yahooapis.com/3.1.0/build/yui/get.js'
       # - 'http://yui.yahooapis.com/3.1.0/build/loader/loader.js'
-      - 'http://yui.yahooapis.com/3.1.0/build/event/event.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/event/event-base.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/event/event-delegate.js'
       - 'http://yui.yahooapis.com/3.1.0/build/event-custom/event-custom.js'
-      - 'http://yui.yahooapis.com/3.1.0/build/dom/dom.js'
-      - 'http://yui.yahooapis.com/3.1.0/build/node/node.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/dom/dom-base.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/dom/selector-native.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/dom/selector-css2.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/node/node-base.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/node/node-event-delegate.js'
 
   yui-3.1.0-base:
     js:
       - 'http://yui.yahooapis.com/3.1.0/build/attribute/attribute.js'
-      - 'http://yui.yahooapis.com/3.1.0/build/pluginhost/pluginhost.js'
-      - 'http://yui.yahooapis.com/3.1.0/build/base/base.js'
+      # - 'http://yui.yahooapis.com/3.1.0/build/pluginhost/pluginhost.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/base/base-base.js'
 
   yui-3.1.0-widget:
     css:

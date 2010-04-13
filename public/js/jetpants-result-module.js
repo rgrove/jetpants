@@ -93,5 +93,5 @@ Y.extend(ResultModule, Y.Base, {
 Y.namespace('Jetpants').ResultModule = ResultModule;
 
 }, '1.0.0', {
-  requires: ['base', 'node', 'jetpants-search']
+  requires: ['base-base', 'node-base', 'jetpants-search']
 });

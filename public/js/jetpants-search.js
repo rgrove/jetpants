@@ -565,7 +565,7 @@ Y.namespace('Jetpants').Search = new Search({contentBox: SELECTOR_CONTENT_BOX});
 
 }, '1.0.0', {
     requires: [
-      'base', 'event', 'event-custom', 'history-lite', 'io-base',
-      'jetpants-result-module', 'json-parse', 'node'
+      'base-base', 'event', 'event-custom', 'history-lite', 'io-base',
+      'jetpants-result-module', 'json-parse', 'node-base'
     ]
 });

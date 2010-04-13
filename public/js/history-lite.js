@@ -324,5 +324,5 @@ if (supportsHashChange) {
 }
 
 }, '@VERSION', {
-    requires: ['event', 'event-custom', 'event-custom-complex']
+    requires: ['event-base', 'event-custom', 'event-custom-complex']
 });
