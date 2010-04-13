@@ -1,14 +1,14 @@
 /*global YUI */
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: false, onevar: true, plusplus: false, white: false */
 
-YUI.add('gallery-history-lite', function (Y) {
+YUI.add('history-lite', function (Y) {
 
 /**
  * The History Lite utility is similar in purpose to the YUI Browser History
  * utility, but with a more flexible API, no initialization or markup
  * requirements, limited IE6/7 support, and a much smaller footprint.
  *
- * @module gallery-history-lite
+ * @module history-lite
  */
 
 /**
@@ -16,196 +16,77 @@ YUI.add('gallery-history-lite', function (Y) {
  * @static
  */
 
-var Lang    = Y.Lang,
-
-    w       = Y.config.win,
-    docMode = Y.config.doc.documentMode,
-    encode  = encodeURIComponent,
-    loc     = w.location,
-
-    // IE8 supports the hashchange event, but only in IE8 Standards
-    // Mode. However, IE8 in IE7 compatibility mode still defines the
-    // event (but never fires it), so we can't just sniff for the event. We
-    // also can't just sniff for IE8, since other browsers will eventually
-    // support this event as well. Thanks Microsoft!
-    supportsHashChange = w.onhashchange !== undefined &&
-            (docMode === undefined || docMode > 7),
-
+// -- Shorthand & Private Vars -------------------------------------------------
+var Lang     = Y.Lang,
+    Obj      = Y.Object,
+    config   = Y.config,
+    docMode  = config.doc && config.doc.documentMode,
+    win      = config.win,
+    encode   = encodeURIComponent,
     lastHash,
-    pollInterval,
-    HistoryLite,
+    location = win.location,
+
+// IE8 supports the hashchange event, but only in IE8 Standards
+// Mode. However, IE8 in IE7 compatibility mode still defines the
+// event (but never fires it), so we can't just sniff for the event. We
+// also can't just sniff for IE8, since other browsers will eventually
+// support this event as well.
+supportsHashChange = (typeof win.onhashchange !== 'undefined') &&
+        (typeof docMode === 'undefined' || docMode > 7),
+
+/**
+ * Fired when the history state changes.
+ *
+ * @event historyLite:change
+ * @param {EventFacade} Event facade with the following additional
+ *     properties:
+ * <dl>
+ *   <dt>changed</dt>
+ *   <dd>
+ *     name:value pairs of history parameters that have been added or
+ *     changed
+ *   </dd>
+ *   <dt>newVal</dt>
+ *   <dd>
+ *     name:value pairs of all history parameters after the change
+ *   </dd>
+ *   <dt>prevVal</dt>
+ *   <dd>
+ *     name:value pairs of all history parameters before the change
+ *   </dd>
+ *   <dt>removed</dt>
+ *   <dd>
+ *     name:value pairs of history parameters that have been removed
+ *     (values are the old values)
+ *   </dd>
+ * </dl>
+ */
+EVT_CHANGE = 'historyLite:change',
+
+HistoryLite = Y.HistoryLite = {
+    // -- Public Properties ----------------------------------------------------
 
     /**
-     * Fired when the history state changes.
+     * The name of this component.
      *
-     * @event history-lite:change
-     * @param {EventFacade} Event facade with the following additional
-     *     properties:
-     * <dl>
-     *   <dt>changed</dt>
-     *   <dd>
-     *     name:value pairs of history parameters that have been added or
-     *     changed
-     *   </dd>
-     *   <dt>newVal</dt>
-     *   <dd>
-     *     name:value pairs of all history parameters after the change
-     *   </dd>
-     *   <dt>prevVal</dt>
-     *   <dd>
-     *     name:value pairs of all history parameters before the change
-     *   </dd>
-     *   <dt>removed</dt>
-     *   <dd>
-     *     name:value pairs of history parameters that have been removed
-     *     (values are the old values)
-     *   </dd>
-     * </dl>
+     * @property NAME
+     * @type String
+     * @static
      */
-    EVT_CHANGE = 'history-lite:change';
+    NAME: 'historyLite',
 
-// -- Private Methods ----------------------------------------------------------
+    // -- Protected Properties -------------------------------------------------
 
-/**
- * Creates a hash string from the specified object of name/value parameter
- * pairs.
- *
- * @method createHash
- * @param {Object} params name/value parameter pairs
- * @return {String} hash string
- * @private
- */
-function createHash(params) {
-    var hash = [];
+    /**
+     * Regular expression used to parse hash/query strings.
+     *
+     * @property _REGEX_QUERY
+     * @type RegExp
+     * @protected
+     * @static
+     */
+    _REGEX_QUERY: /([^\?#&]+)=([^&]+)/g,
 
-    Y.each(params, function (value, name) {
-        if (Lang.isValue(value)) {
-            hash.push(encode(name) + '=' + encode(value));
-        }
-    });
-
-    return '#' + hash.join('&');
-}
-
-/**
- * Wrapper around <code>decodeURIComponent()</code> that also converts +
- * chars into spaces.
- *
- * @method decode
- * @param {String} string string to decode
- * @return {String} decoded string
- * @private
- */
-function decode(string) {
-    return decodeURIComponent(string.replace(/\+/g, ' '));
-}
-
-/**
- * Gets the current URL hash.
- *
- * @method getHash
- * @return {String}
- * @private
- */
-var getHash;
-
-if (Y.UA.gecko) {
-    // We branch at runtime for Gecko since window.location.hash in Gecko
-    // returns a decoded string, and we want all encoding untouched.
-    getHash = function () {
-        var matches = /#.*$/.exec(loc.href);
-        return matches && matches[0] ? matches[0] : '';
-    };
-} else {
-    getHash = function () {
-        return loc.hash;
-    };
-}
-
-/**
- * Sets the browser's location hash to the specified string.
- *
- * @method setHash
- * @param {String} hash
- * @private
- */
-function setHash(hash) {
-    loc.hash = hash;
-}
-
-// -- Private Event Handlers ---------------------------------------------------
-
-/**
- * Handles changes to the location hash and fires the history-lite:change
- * event if necessary.
- *
- * @method handleHashChange
- * @param {String} newHash new hash value
- * @private
- */
-function handleHashChange(newHash) {
-    var changedParams = {},
-        lastParsed    = HistoryLite.parseQuery(lastHash),
-        newParsed     = HistoryLite.parseQuery(newHash),
-        removedParams = {},
-
-        facade =  {
-            newParsed : newParsed,
-            prevParsed: lastParsed
-        },
-
-        isChanged;
-
-    // Figure out what changed.
-    Y.each(newParsed, function (newVal, param) {
-        var prevVal = lastParsed[param];
-
-        if (newVal !== prevVal) {
-            changedParams[param] = newVal;
-            isChanged = true;
-
-            HistoryLite.fire(param + 'Change', Y.merge(facade, {
-                newVal : newVal,
-                prevVal: prevVal
-            }));
-        }
-    });
-
-    // Figure out what was removed.
-    Y.each(lastParsed, function (value, param) {
-        if (!newParsed.hasOwnProperty(param)) {
-            removedParams[param] = value;
-            isChanged = true;
-
-            HistoryLite.fire(param + 'Remove', Y.merge(facade, {
-                prevVal: value
-            }));
-        }
-    });
-
-    if (isChanged) {
-        HistoryLite.fire(EVT_CHANGE, Y.merge(facade, {
-            changed: changedParams,
-            newVal : newHash,
-            prevVal: lastHash,
-            removed: removedParams
-        }));
-    }
-}
-
-/**
- * Default handler for the history-lite:change event. Stores the new hash for
- * later comparison and event triggering.
- *
- * @method defaultChangeHandler
- * @param {EventFacade} e
- * @private
- */
-function defaultChangeHandler(e) {
-    lastHash = e.newVal;
-}
-
-Y.HistoryLite = HistoryLite = {
     // -- Public Methods -------------------------------------------------------
 
     /**
@@ -216,53 +97,204 @@ Y.HistoryLite = HistoryLite = {
      * @method add
      * @param {String|Object} params query string, hash string, or object
      *     containing name/value parameter pairs
-     * @param {Boolean} silent if <em>true</em>, a history change event will
-     *     not be fired for this change
+     * @param {Boolean} silent if <em>true</em>, a history change event will not
+     *     be fired for this change
+     * @static
      */
     add: function (params, silent) {
-        var newHash = createHash(Y.merge(HistoryLite.parseQuery(getHash()),
-                Lang.isString(params) ? HistoryLite.parseQuery(params) : params));
+        var _params = Lang.isString(params) ? this.parseQuery(params) : params,
+            newHash = this._createHash(Y.merge(this.parseQuery(this._getHash()), _params));
 
         if (silent) {
-            defaultChangeHandler({newVal: newHash});
+            this._defChangeFn({newVal: newHash});
         }
 
-        setHash(newHash);
+        this._setHash(newHash);
     },
 
     /**
-     * Gets the current value of the specified history parameter, or an
-     * object of name/value pairs for all current values if no parameter
-     * name is specified.
+     * Gets the current value of the specified history parameter, or an object
+     * of name/value pairs for all current values if no parameter name is
+     * specified.
      *
      * @method get
      * @param {String} name (optional) parameter name
      * @return {Object|mixed}
+     * @static
      */
     get: function (name) {
-        var params = HistoryLite.parseQuery(getHash());
+        var params = this.parseQuery(this._getHash());
         return name ? params[name] : params;
     },
 
     /**
-     * Parses a query string or hash string into an object of name/value
+     * Parses a query string or hash string into an object hash of name/value
      * parameter pairs.
      *
      * @method parseQuery
      * @param {String} query query string or hash string
      * @return {Object}
+     * @static
      */
     parseQuery: function (query) {
-        var matches = query.match(/([^\?#&]+)=([^&]+)/g) || [],
-            params  = {},
-            i, len, param;
+        // TODO: memoize this function
+        var decode  = this._decode,
+            i,
+            matches = query.match(this._REGEX_QUERY) || [],
+            len     = matches.length,
+            param,
+            params  = {};
 
-        for (i = 0, len = matches.length; i < len; ++i) {
+        for (i = 0; i < len; ++i) {
             param = matches[i].split('=');
             params[decode(param[0])] = decode(param[1]);
         }
 
         return params;
+    },
+
+    // -- Protected Methods ----------------------------------------------------
+
+    /**
+     * Creates a hash string from the specified object hash of name/value
+     * parameter pairs.
+     *
+     * @method _createHash
+     * @param {Object} params name/value parameter pairs
+     * @return {String} hash string
+     * @protected
+     * @static
+     */
+    _createHash: function (params) {
+        var hash = [];
+
+        Obj.each(params, function (value, name) {
+            if (Lang.isValue(value)) {
+                hash.push(encode(name) + '=' + encode(value));
+            }
+        });
+
+        return '#' + hash.join('&');
+    },
+
+    /**
+     * Wrapper around <code>decodeURIComponent()</code> that also converts +
+     * chars into spaces.
+     *
+     * @method _decode
+     * @param {String} string string to decode
+     * @return {String} decoded string
+     * @protected
+     * @static
+     */
+    _decode: function (string) {
+        return decodeURIComponent(string.replace(/\+/g, ' '));
+    },
+
+    /**
+     * Gets the current URL hash.
+     *
+     * @method _getHash
+     * @return {String}
+     * @protected
+     * @static
+     */
+    _getHash: (Y.UA.gecko ? function () {
+        // Gecko's window.location.hash returns a decoded string and we want all
+        // encoding untouched, so we need to get the hash value from
+        // window.location.href instead.
+        var matches = /#.*$/.exec(location.href);
+        return matches && matches[0] ? matches[0] : '';
+    } : function () {
+        return location.hash;
+    }),
+
+    /**
+     * Sets the browser's location hash to the specified string.
+     *
+     * @method _setHash
+     * @param {String} hash
+     * @protected
+     * @static
+     */
+    _setHash: function (hash) {
+        location.hash = hash;
+    },
+
+    // -- Protected Event Handlers ---------------------------------------------
+
+    /**
+     * Handles changes to the location hash and fires the history-lite:change
+     * event if necessary.
+     *
+     * @method _afterHashChange
+     * @param {String} newHash new hash value
+     * @protected
+     * @static
+     */
+    _afterHashChange: function (newHash) {
+        var changedParams = {},
+            lastParsed    = this.parseQuery(lastHash),
+            newParsed     = this.parseQuery(newHash),
+            removedParams = {},
+
+            facade =  {
+                newParsed : newParsed,
+                prevParsed: lastParsed
+            },
+
+            isChanged;
+
+        // Figure out what changed.
+        Obj.each(newParsed, function (newVal, param) {
+            var prevVal = lastParsed[param];
+
+            if (newVal !== prevVal) {
+                changedParams[param] = newVal;
+                isChanged = true;
+
+                this.fire(param + 'Change', Y.merge(facade, {
+                    newVal : newVal,
+                    prevVal: prevVal
+                }));
+            }
+        }, this);
+
+        // Figure out what was removed.
+        Obj.each(lastParsed, function (value, param) {
+            if (!newParsed.hasOwnProperty(param)) {
+                removedParams[param] = value;
+                isChanged = true;
+
+                this.fire(param + 'Remove', Y.merge(facade, {
+                    prevVal: value
+                }));
+            }
+        }, this);
+
+        if (isChanged) {
+            this.fire(EVT_CHANGE, Y.merge(facade, {
+                changed: changedParams,
+                newVal : newHash,
+                prevVal: lastHash,
+                removed: removedParams
+            }));
+        }
+    },
+
+    // -- Private Event Handlers -----------------------------------------------
+
+    /**
+     * Default handler for the history-lite:change event. Stores the new hash
+     * for later comparison and event triggering.
+     *
+     * @method _defChangeFn
+     * @param {EventFacade} e event object for history change events
+     * @private
+     * @static
+     */
+    _defChangeFn: function (e) {
+        lastHash = e.newVal;
     }
 };
 
@@ -271,28 +303,26 @@ Y.augment(HistoryLite, Y.EventTarget, true, null, {emitFacade: true});
 
 HistoryLite.publish(EVT_CHANGE, {
     broadcast: 2,
-    defaultFn: defaultChangeHandler
+    defaultFn: HistoryLite._defChangeFn
 });
 
 // Start watching for hash changes.
-lastHash = getHash();
+lastHash = HistoryLite._getHash();
 
 if (supportsHashChange) {
-    Y.Node.DOM_EVENTS.hashchange = true;
-
-    Y.on('hashchange', function () {
-        handleHashChange(getHash());
-    }, w);
+    Y.Event.attach('hashchange', function () {
+        this._afterHashChange(this._getHash());
+    }, win, HistoryLite);
 } else {
-    pollInterval = pollInterval || Y.later(50, HistoryLite, function () {
-        var hash = getHash();
+    Y.later(config.pollInterval || 50, HistoryLite, function () {
+        var hash = this._getHash();
 
         if (hash !== lastHash) {
-            handleHashChange(hash);
+            this._afterHashChange(hash);
         }
     }, null, true);
 }
 
-}, '1.0.0', {
-    requires: ['event-custom', 'event-custom-complex', 'node']
+}, '@VERSION', {
+    requires: ['event', 'event-custom', 'event-custom-complex']
 });

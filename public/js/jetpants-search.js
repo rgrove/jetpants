@@ -260,7 +260,7 @@ Y.extend(Search, Y.Base, {
 
   // -- Protected Methods ------------------------------------------------------
   _attachEvents: function () {
-    Y.after('history-lite:change', this._afterHistoryChange, this);
+    Y.after('historyLite:change', this._afterHistoryChange, this);
 
     this.after('pendingQueryChange', this._afterPendingQueryChange);
     this.after('queryChange', this._afterQueryChange);
@@ -565,7 +565,7 @@ Y.namespace('Jetpants').Search = new Search({contentBox: SELECTOR_CONTENT_BOX});
 
 }, '1.0.0', {
     requires: [
-      'base', 'event', 'event-custom', 'gallery-history-lite', 'io-base',
+      'base', 'event', 'event-custom', 'history-lite', 'io-base',
       'jetpants-result-module', 'json-parse', 'node'
     ]
 });
