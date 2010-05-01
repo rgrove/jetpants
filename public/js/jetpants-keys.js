@@ -22,7 +22,7 @@ ATTRS = {},
 CURRENT_FOCUS  = 'currentFocus',
 
 SELECTOR_FOCUSABLE = '#hd input.q, #results .web h3 a',
-SELECTOR_INPUT     = 'input[type=text],input[type=password],select,textarea';
+SELECTOR_INPUT     = 'input[type=password],input[type=search],input[type=text],select,textarea';
 
 // -- Static Properties and Attributes -----------------------------------------
 Keys.NAME  = 'keys';
