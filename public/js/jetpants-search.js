@@ -230,6 +230,7 @@ Y.extend(Search, Y.Base, {
   // -- Public Instance Methods ------------------------------------------------
   initializer: function (config) {
     this.publish(EVT_SEARCH,         {defaultFn: this._defSearchFn});
+    this.publish(EVT_SEARCH_END,     {defaultFn: this._defSearchEndFn});
     this.publish(EVT_SEARCH_FAILURE, {defaultFn: this._defSearchFailureFn});
     this.publish(EVT_SEARCH_SUCCESS, {defaultFn: this._defSearchSuccessFn});
 
@@ -517,7 +518,16 @@ Y.extend(Search, Y.Base, {
     DOM.removeClass(doc.documentElement, 'entry');
     doc.title = e.query + ' - Jetpants Search';
 
+    Y.one(SELECTOR_RESULTS_LEFT).addClass('loading');
     this._search();
+  },
+
+  /**
+   * @method _defSearchEndFn
+   * @private
+   */
+  _defSearchEndFn: function (e) {
+    Y.one(SELECTOR_RESULTS_LEFT).removeClass('loading');
   },
 
   /**

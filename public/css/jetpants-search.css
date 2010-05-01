@@ -147,6 +147,13 @@ ol, ul {
   width: 600px;
 }
 
+#results > .left.loading {
+  background-image: url(http://cdn.jetpants.com/img/loading.gif);
+  background-position: center center;
+  background-repeat: no-repeat;
+  height: 100px;
+}
+
 #results > .right {
   left: 600px;
   margin: 0 0 0 10px;
