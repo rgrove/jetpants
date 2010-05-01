@@ -56,6 +56,11 @@ SELECTOR_RESULTS_RIGHT    = SELECTOR_RESULTS + ' .right',
 // -- Public Events ------------------------------------------------------------
 
 /**
+ * @event resultsRender
+ */
+EVT_RESULTS_RENDER = 'resultsRender',
+
+/**
  * @event search
  */
 EVT_SEARCH = 'search',
@@ -490,6 +495,8 @@ Y.extend(Search, Y.Base, {
     YObject.each(this._activeModules, function (module) {
       module.render();
     }, this);
+
+    this.fire(EVT_RESULTS_RENDER);
   },
 
   /**
