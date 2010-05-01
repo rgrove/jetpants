@@ -21,12 +21,13 @@ function Search(config) {
 var doc = Y.config.doc,
     win = Y.config.win,
 
-Array     = Y.Array,
 Attribute = Y.Attribute,
 DOM       = Y.DOM,
 History   = Y.HistoryLite,
 Lang      = Y.Lang,
 Node      = Y.Node,
+YArray    = Y.Array,
+YObject   = Y.Object,
 
 ATTRS = {},
 UI    = 'ui',
@@ -282,7 +283,7 @@ Y.extend(Search, Y.Base, {
 
   _compileTemplates: function (templates) {
     if (Lang.isObject(templates)) {
-      Y.Object.each(templates, function (value, name) {
+      YObject.each(templates, function (value, name) {
         templates[name] = this._compileTemplates(value);
       }, this);
 
@@ -300,7 +301,7 @@ Y.extend(Search, Y.Base, {
         UA         = Y.UA;
 
     // Assign useragent-specific classnames to the root element for use in CSS.
-    Array.each(agents, function (agent) {
+    YArray.each(agents, function (agent) {
       if (UA[agent]) {
         root.addClass(agent);
       }
@@ -330,17 +331,6 @@ Y.extend(Search, Y.Base, {
       this.get(QUERY_NODES).item(0).focus();
     }
   },
-
-  // _renderImageResults: function (parent) {
-  //   var results  = this.get(RESULTS + '.images'),
-  //       template = this.get(TEMPLATES + '.images');
-  // 
-  //   if (!results || !results.results || !results.results.length) {
-  //     return;
-  //   }
-  // 
-  //   Y.one(parent).append(template.expand(results));
-  // },
 
   _search: function () {
     var config = this.getAttrs([QUERY, RESULT_COUNT, RESULT_START]),
@@ -405,7 +395,7 @@ Y.extend(Search, Y.Base, {
   // -- Protected Event Handlers -----------------------------------------------
 
   /**
-   * @method _onHistoryChange
+   * @method _afterHistoryChange
    * @protected
    */
   _afterHistoryChange: function (e) {
@@ -477,12 +467,12 @@ Y.extend(Search, Y.Base, {
       this._set(TEMPLATES, templates = this._compileTemplates(results.templates));
     }
 
-    Y.Object.each(this._activeModules, function (module, name) {
+    YObject.each(this._activeModules, function (module, name) {
       module.destroy();
       delete this._activeModules[name];
     }, this);
 
-    Y.Object.each(results.results, function (results, name) {
+    YObject.each(results.results, function (results, name) {
       var Module = this._resultModules[name];
 
       if (Module) {
@@ -496,7 +486,7 @@ Y.extend(Search, Y.Base, {
       }
     }, this);
 
-    Y.Object.each(this._activeModules, function (module) {
+    YObject.each(this._activeModules, function (module) {
       module.render();
     }, this);
   },
