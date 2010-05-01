@@ -47,6 +47,8 @@ components:
       # - 'http://yui.yahooapis.com/3.1.0/build/loader/loader.js'
       - 'http://yui.yahooapis.com/3.1.0/build/event/event-base.js'
       - 'http://yui.yahooapis.com/3.1.0/build/event/event-delegate.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/event/event-key.js'
+      - 'http://yui.yahooapis.com/3.1.0/build/event/event-focus.js'
       - 'http://yui.yahooapis.com/3.1.0/build/event-custom/event-custom.js'
       - 'http://yui.yahooapis.com/3.1.0/build/dom/dom-base.js'
       - 'http://yui.yahooapis.com/3.1.0/build/dom/selector-native.js'
@@ -85,6 +87,7 @@ components:
       - ext/json-template.js
       - history-lite.js
       - jetpants-search.js
+      - jetpants-keys.js
       - jetpants-result-module.js
       - jetpants-shortcut-module.js
       - result-modules/web.js

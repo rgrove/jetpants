@@ -22,7 +22,7 @@
 </div>
 
 <script src="<%== @resources['jetpants-search']['js'] %>"></script>
-<script>var Y = YUI({bootstrap: false}).use('jetpants-search', 'jetpants-result-module-web', 'jetpants-shortcut-module-twitter');</script>
+<script>var Y = YUI({bootstrap: false}).use('jetpants-search', 'jetpants-keys', 'jetpants-result-module-web', 'jetpants-shortcut-module-twitter');</script>
 
 </body>
 </html>

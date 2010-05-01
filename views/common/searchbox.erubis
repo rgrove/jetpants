@@ -1,7 +1,7 @@
 <form class="sf" method="get" action="/" role="search">
   <div>
     <input type="search" name="q" class="q" placeholder="Search the Internets!"
-        tabindex="0" value="<%== @q || '' %>">
+        tabindex="0" autocomplete="off" value="<%== @q || '' %>">
     <input type="submit" class="sb" value="Search">
   </div>
 </form>
