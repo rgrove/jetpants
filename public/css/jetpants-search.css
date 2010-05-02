@@ -26,8 +26,11 @@ ol, ul {
 }
 
 #doc { min-width: 650px; }
-#doc.entry { max-width: none; }
 #doc.loading { display: none; }
+
+.iphone #doc {
+  min-width: 0;
+}
 
 /* -- Header ---------------------------------------------------------------- */
 #hd {
@@ -39,11 +42,18 @@ ol, ul {
 }
 
 .entry #hd { border: 0; }
+.iphone #hd { padding: 14px; }
 
 /* Search form */
 .entry .sf {
   margin: 15% auto 0;
   width: 500px;
+}
+
+.iphone .sf,
+.entry.iphone .sf {
+  margin: 0;
+  width: 100%;
 }
 
 .q,
@@ -84,6 +94,8 @@ ol, ul {
 .entry .q { width: 380px; }
 .entry.webkit .q { width: 400px; }
 
+.webkit.iphone .q { width: 68%; }
+
 /* Search button */
 .sb {
   background: #456e99;
@@ -101,6 +113,7 @@ ol, ul {
 }
 
 .ie .sb { font-weight: bold; }
+.iphone .sb { width: auto; }
 
 .sb:focus,
 .sb:hover {
@@ -109,18 +122,6 @@ ol, ul {
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffa8dcff,endColorstr=#ff547fab);
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffa8dcff,endColorstr=#ff547fab)";
 }
-
-/* Info text */
-.info {
-  font-size: 12px;
-  padding: 4px 6px;
-  text-align: right;
-}
-
-.entry .info { display: none; }
-
-.info p { margin: 0; }
-.info p.loading { color: #afafaf; }
 
 /* -- Body ------------------------------------------------------------------ */
 #bd {
@@ -131,6 +132,7 @@ ol, ul {
 }
 
 .entry #bd { display: none; }
+.iphone #bd { padding: 0 14px; }
 
 #results { position: relative; }
 
@@ -147,6 +149,8 @@ ol, ul {
   width: 600px;
 }
 
+.iphone #results > .left { width: 100%; }
+
 #results > .left.loading {
   background-image: url(http://cdn.jetpants.com/img/loading.gif);
   background-position: center center;
@@ -160,6 +164,8 @@ ol, ul {
   position: absolute;
 }
 
+.iphone #results > .right { display: none; }
+
 /* -- Web Results ----------------------------------------------------------- */
 .web {
   font-size: 13px;
@@ -167,8 +173,11 @@ ol, ul {
   padding-left: 10px;
 }
 
+.iphone .web { padding: 0; }
+
 .web cite {
   color: #568e1a;
+  margin-right: 0.2em;
   word-wrap: break-word;
 }
 
@@ -176,15 +185,17 @@ ol, ul {
 .web li.indent { margin-left: 2.5em; }
 .web .abstract { max-width: 42em; }
 
+.iphone .web .abstract { max-width: 100%; }
+
 .web .delicious-saves {
   background: #eff8ff;
   border: 1px solid #c1e0f7;
   border-radius: 3px;
   color: #555;
   font-size: 11px;
-  margin-left: 0.2em;
   padding: 1px 3px 0;
   text-decoration: none;
+  white-space: nowrap;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
 }
@@ -227,6 +238,8 @@ ol, ul {
   width: 573px;
 }
 
+.iphone .sc { width: 93%; }
+
 .sc .hd h2 {
   background: #eee;
   border: 1px solid #eaeaea;
@@ -244,7 +257,6 @@ ol, ul {
 .images a {
   float: left;
   height: 90px;
-/*  line-height: 90px;*/
   margin: 0 6px 15px;
   text-align: center;
   width: 110px;
@@ -280,6 +292,8 @@ ol, ul {
   max-width: 50em;
 }
 
+.iphone .twitter li p { max-width: 100%; }
+
 .twitter .meta,
 .twitter .meta a { color: #777; }
 
@@ -303,6 +317,8 @@ ol, ul {
   margin: 1em 0;
 }
 
+.iphone .pg { line-height: 1.2em; }
+
 .pg:after {
   clear: left;
   content: ".";
@@ -317,6 +333,11 @@ ol, ul {
   display: block;
   padding: 0.3em 0.6em;
   text-align: center;
+}
+
+.iphone .pg a,
+.iphone .pg strong {
+  padding: 0.3em 0.5em;
 }
 
 .pg a {
@@ -346,6 +367,10 @@ ol, ul {
   border-top: 2px solid #cfe0ff;
   margin: 2em 24px 0;
   padding: 4px 6px 18px;
+}
+
+.iphone #ft {
+  margin: 2em 14px 0;
 }
 
 .entry #ft { display: none; }

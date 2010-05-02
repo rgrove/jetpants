@@ -5,6 +5,7 @@
   <title>Jetpants Search</title>
   <link rel="stylesheet" type="text/css" href="<%== @resources['jetpants-search']['css'] %>">
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Jetpants">
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0">
 </head>
 <body role="document">
 

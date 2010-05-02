@@ -302,6 +302,7 @@ Y.extend(Search, Y.Base, {
   _render: function () {
     var agents     = ['chrome', 'gecko', 'ie', 'mobile', 'opera', 'webkit'],
         autoFocus  = true,
+        platform,
         query      = this.get(QUERY),
         root       = Y.one(doc.documentElement),
         UA         = Y.UA;
@@ -315,6 +316,19 @@ Y.extend(Search, Y.Base, {
 
     if (UA.os) {
       root.addClass(UA.os);
+    }
+
+    if (UA.mobile && UA.webkit) {
+      platform = win.navigator.platform;
+
+      // Prevent back button caching, since this screws up our layout.
+      Y.on('unload', function () {}, win);
+
+      if (platform.indexOf('iPhone') === 0) {
+        root.addClass('iphone');
+      } else if (platform.indexOf('iPad') === 0) {
+        root.addClass('ipad');
+      }
     }
 
     // If the URL contains a search query, remove the .entry class from the
