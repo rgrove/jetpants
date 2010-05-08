@@ -70,6 +70,10 @@ Y.extend(Keys, Y.Base, {
     Y.on('key', this._onKeySearch, doc, 'down:27,191', this);
   },
 
+  _hasModifier: function (e) {
+    return e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+  },
+
   // -- Protected Event Handlers -----------------------------------------------
   _onBlur: function () {
     this._set(CURRENT_FOCUS, null);
@@ -82,7 +86,7 @@ Y.extend(Keys, Y.Base, {
   _onKeyPaginate: function (e) {
     var prevLink, nextLink;
 
-    if (e.target.test(SELECTOR_INPUT)) {
+    if (e.target.test(SELECTOR_INPUT) || this._hasModifier(e)) {
       return;
     }
 
@@ -112,35 +116,38 @@ Y.extend(Keys, Y.Base, {
   _onKeyResultNav: function (e) {
     var currentFocus, focusable, focusableLen, focusedItem;
 
-    if (e.keyCode === 40 || !e.target.test(SELECTOR_INPUT)) {
-      e.preventDefault();
+    if ((e.keyCode !== 40 && e.target.test(SELECTOR_INPUT)) ||
+        this._hasModifier(e)) {
+      return;
+    }
 
-      currentFocus = this.get(CURRENT_FOCUS);
-      focusable    = Y.all(SELECTOR_FOCUSABLE);
-      focusableLen = focusable.size();
-      focusedItem  = currentFocus ? focusable.indexOf(currentFocus) : -1;
+    e.preventDefault();
 
-      switch (e.keyCode) {
-        case 38: // up arrow
-        case 75: // k
-          // Focus the nearest web result above us.
-          if (focusedItem > 0) {
-            focusable.item(focusedItem - 1).focus();
-          } else {
-            focusable.item(0).focus();
-          }
-          break;
+    currentFocus = this.get(CURRENT_FOCUS);
+    focusable    = Y.all(SELECTOR_FOCUSABLE);
+    focusableLen = focusable.size();
+    focusedItem  = currentFocus ? focusable.indexOf(currentFocus) : -1;
 
-        case 40: // down arrow
-        case 74: // j
-          // Focus the nearest web result below us.
-          if (focusedItem === -1 && focusableLen > 1) {
-            focusable.item(1).focus();
-          } else if (focusedItem < focusableLen - 1) {
-            focusable.item(focusedItem + 1).focus();
-          }
-          break;
-      }
+    switch (e.keyCode) {
+      case 38: // up arrow
+      case 75: // k
+        // Focus the nearest web result above us.
+        if (focusedItem > 0) {
+          focusable.item(focusedItem - 1).focus();
+        } else {
+          focusable.item(0).focus();
+        }
+        break;
+
+      case 40: // down arrow
+      case 74: // j
+        // Focus the nearest web result below us.
+        if (focusedItem === -1 && focusableLen > 1) {
+          focusable.item(0).focus();
+        } else if (focusedItem < focusableLen - 1) {
+          focusable.item(focusedItem + 1).focus();
+        }
+        break;
     }
   },
 
@@ -148,7 +155,8 @@ Y.extend(Keys, Y.Base, {
     var firstLink,
         queryInput = Search.get('queryNodes').item(0);
 
-    if (e.keyCode !== 27 && e.target.test(SELECTOR_INPUT)) {
+    if ((e.keyCode !== 27 && e.target.test(SELECTOR_INPUT)) ||
+        this._hasModifier(e)) {
       return;
     }
 
