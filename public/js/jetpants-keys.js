@@ -21,8 +21,12 @@ var Search = Y.Jetpants.Search,
 ATTRS = {},
 CURRENT_FOCUS  = 'currentFocus',
 
-SELECTOR_FOCUSABLE = '#hd input.q, #results .web h3 a',
-SELECTOR_INPUT     = 'input[type=password],input[type=search],input[type=text],select,textarea';
+SELECTOR_WEB             = '#results .web',
+SELECTOR_FOCUSABLE       = SELECTOR_WEB + ' h3 a',
+SELECTOR_INPUT           = 'input[type=search],input[type=text],input[type=password],select,textarea',
+SELECTOR_PAGINATION_NEXT = SELECTOR_WEB + ' .pg li.next a',
+SELECTOR_PAGINATION_PREV = SELECTOR_WEB + ' .pg li.prev a',
+SELECTOR_WEB_RESULT      = SELECTOR_WEB + ' a';
 
 // -- Static Properties and Attributes -----------------------------------------
 Keys.NAME  = 'keys';
@@ -53,13 +57,17 @@ Y.extend(Keys, Y.Base, {
     Y.on('blur', this._onBlur, doc, this);
     Y.on('focus', this._onFocus, doc, this);
 
-    // Keys  : esc, /
-    // Action: Focus the search box and select its contents.
-    Y.on('key', this._onKeySearch, doc, 'down:27,191', this);
+    // Keys  : h, l, p, n
+    // Action: Previous page / Next page
+    Y.on('key', this._onKeyPaginate, doc, 'down:72,76,78,80', this);
 
     // Keys  : up arrow, down arrow, j, k
     // Action: Select previous/next web result.
     Y.on('key', this._onKeyResultNav, doc, 'down:38,40,74,75', this);
+
+    // Keys  : /, esc
+    // Action: Focus or blur the search box
+    Y.on('key', this._onKeySearch, doc, 'down:27,191', this);
   },
 
   // -- Protected Event Handlers -----------------------------------------------
@@ -69,6 +77,36 @@ Y.extend(Keys, Y.Base, {
 
   _onFocus: function (e) {
     this._set(CURRENT_FOCUS, e.target);
+  },
+
+  _onKeyPaginate: function (e) {
+    var prevLink, nextLink;
+
+    if (e.target.test(SELECTOR_INPUT)) {
+      return;
+    }
+
+    e.preventDefault();
+
+    switch (e.keyCode) {
+      case 72: // h
+      case 80: // p
+        prevLink = Y.one(SELECTOR_PAGINATION_PREV);
+
+        if (prevLink) {
+          Y.config.win.location = prevLink.getAttribute('href');
+        }
+        break;
+
+      case 76: // l
+      case 78: // n
+        nextLink = Y.one(SELECTOR_PAGINATION_NEXT);
+
+        if (nextLink) {
+          Y.config.win.location = nextLink.getAttribute('href');
+        }
+        break;
+    }
   },
 
   _onKeyResultNav: function (e) {
@@ -83,10 +121,9 @@ Y.extend(Keys, Y.Base, {
       focusedItem  = currentFocus ? focusable.indexOf(currentFocus) : -1;
 
       switch (e.keyCode) {
-        case 38:
-        case 75: // up arrow, k
-          // Focus the nearest web result above us, or the search box if there
-          // are no web results above us.
+        case 38: // up arrow
+        case 75: // k
+          // Focus the nearest web result above us.
           if (focusedItem > 0) {
             focusable.item(focusedItem - 1).focus();
           } else {
@@ -94,8 +131,8 @@ Y.extend(Keys, Y.Base, {
           }
           break;
 
-        case 40:
-        case 74: // down arrow, j
+        case 40: // down arrow
+        case 74: // j
           // Focus the nearest web result below us.
           if (focusedItem === -1 && focusableLen > 1) {
             focusable.item(1).focus();
@@ -108,9 +145,24 @@ Y.extend(Keys, Y.Base, {
   },
 
   _onKeySearch: function (e) {
-    if (!e.target.test(SELECTOR_INPUT)) {
-      e.preventDefault();
-      Search.get('queryNodes').item(0).focus().select();
+    var firstLink,
+        queryInput = Search.get('queryNodes').item(0);
+
+    if (e.keyCode !== 27 && e.target.test(SELECTOR_INPUT)) {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (e.keyCode === 27) {
+      // Focus the first web result.
+      firstLink = Y.one(SELECTOR_WEB_RESULT);
+
+      if (firstLink) {
+        firstLink.focus();
+      }
+    } else if (e.keyCode === 191) {
+      queryInput.focus().select();
     }
   }
 });
