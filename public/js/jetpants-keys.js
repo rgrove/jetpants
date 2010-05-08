@@ -84,7 +84,7 @@ Y.extend(Keys, Y.Base, {
 
       switch (e.keyCode) {
         case 38:
-        case 74: // up arrow, j
+        case 75: // up arrow, k
           // Focus the nearest web result above us, or the search box if there
           // are no web results above us.
           if (focusedItem > 0) {
@@ -95,7 +95,7 @@ Y.extend(Keys, Y.Base, {
           break;
 
         case 40:
-        case 75: // down arrow, k
+        case 74: // down arrow, j
           // Focus the nearest web result below us.
           if (focusedItem === -1 && focusableLen > 1) {
             focusable.item(1).focus();

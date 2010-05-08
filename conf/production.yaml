@@ -3,7 +3,7 @@
 resources:
   jetpants-search:
     css: http://cdn.jetpants.com/css/jetpants-search-201005021531.css
-    js: http://cdn.jetpants.com/js/jetpants-search-201005021531.js
+    js: http://cdn.jetpants.com/js/jetpants-search-201005071731.js
 
 # -- Providers -----------------------------------------------------------------
 providers:
