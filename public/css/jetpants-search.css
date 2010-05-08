@@ -155,7 +155,7 @@ ol, ul {
   background-image: url(http://cdn.jetpants.com/img/loading.gif);
   background-position: center center;
   background-repeat: no-repeat;
-  height: 100px;
+  min-height: 200px;
 }
 
 #results > .right {
