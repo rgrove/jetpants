@@ -27,10 +27,7 @@ ol, ul {
 
 #doc { min-width: 650px; }
 #doc.loading { display: none; }
-
-.iphone #doc {
-  min-width: 0;
-}
+.mobile #doc { min-width: 0; }
 
 /* -- Header ---------------------------------------------------------------- */
 #hd {
@@ -42,7 +39,7 @@ ol, ul {
 }
 
 .entry #hd { border: 0; }
-.iphone #hd { padding: 14px; }
+.mobile #hd { padding: 14px; }
 
 /* Search form */
 .entry .sf {
@@ -50,8 +47,8 @@ ol, ul {
   width: 500px;
 }
 
-.iphone .sf,
-.entry.iphone .sf {
+.mobile .sf,
+.entry.mobile .sf {
   margin: 0;
   width: 100%;
 }
@@ -94,7 +91,7 @@ ol, ul {
 .entry .q { width: 380px; }
 .entry.webkit .q { width: 400px; }
 
-.webkit.iphone .q { width: 68%; }
+.webkit.mobile .q { width: 68%; }
 
 /* Search button */
 .sb {
@@ -113,7 +110,7 @@ ol, ul {
 }
 
 .ie .sb { font-weight: bold; }
-.iphone .sb { width: auto; }
+.mobile .sb { width: auto; }
 
 .sb:focus,
 .sb:hover {
@@ -132,7 +129,7 @@ ol, ul {
 }
 
 .entry #bd { display: none; }
-.iphone #bd { padding: 0 14px; }
+.mobile #bd { padding: 0 14px; }
 
 #results { position: relative; }
 
@@ -149,7 +146,7 @@ ol, ul {
   width: 600px;
 }
 
-.iphone #results > .left { width: 100%; }
+.mobile #results > .left { width: 100%; }
 
 #results > .left.loading {
   background-image: url(http://cdn.jetpants.com/img/loading.gif);
@@ -164,7 +161,7 @@ ol, ul {
   position: absolute;
 }
 
-.iphone #results > .right { display: none; }
+.mobile #results > .right { display: none; }
 
 /* -- Web Results ----------------------------------------------------------- */
 .web {
@@ -173,7 +170,7 @@ ol, ul {
   padding-left: 10px;
 }
 
-.iphone .web { padding: 0; }
+.mobile .web { padding: 0; }
 
 .web cite {
   color: #568e1a;
@@ -185,7 +182,7 @@ ol, ul {
 .web li.indent { margin-left: 2.5em; }
 .web .abstract { max-width: 42em; }
 
-.iphone .web .abstract { max-width: 100%; }
+.mobile .web .abstract { max-width: 100%; }
 
 .web .delicious-saves {
   background: #eff8ff;
@@ -238,7 +235,7 @@ ol, ul {
   width: 573px;
 }
 
-.iphone .sc { width: 93%; }
+.mobile .sc { width: 93%; }
 
 .sc .hd h2 {
   background: #eee;
@@ -292,7 +289,7 @@ ol, ul {
   max-width: 50em;
 }
 
-.iphone .twitter li p { max-width: 100%; }
+.mobile .twitter li p { max-width: 100%; }
 
 .twitter .meta,
 .twitter .meta a { color: #777; }
@@ -317,7 +314,7 @@ ol, ul {
   margin: 1em 0;
 }
 
-.iphone .pg { line-height: 1.2em; }
+.mobile .pg { line-height: 1.2em; }
 
 .pg:after {
   clear: left;
@@ -335,8 +332,8 @@ ol, ul {
   text-align: center;
 }
 
-.iphone .pg a,
-.iphone .pg strong {
+.mobile .pg a,
+.mobile .pg strong {
   padding: 0.3em 0.5em;
 }
 
@@ -369,9 +366,7 @@ ol, ul {
   padding: 4px 6px 18px;
 }
 
-.iphone #ft {
-  margin: 2em 14px 0;
-}
+.mobile #ft { margin: 2em 14px 0; }
 
 .entry #ft { display: none; }
 

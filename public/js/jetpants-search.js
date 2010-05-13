@@ -328,6 +328,7 @@ Y.extend(Search, Y.Base, {
         root.addClass('iphone');
       } else if (platform.indexOf('iPad') === 0) {
         root.addClass('ipad');
+        root.removeClass('mobile'); // because the iPad has a lovely big display
       }
     }
 
