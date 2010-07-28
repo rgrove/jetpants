@@ -22,4 +22,4 @@ providers:
 
   web:
     <<: *boss
-    timeout: 2000
+    timeout: 10000
