@@ -18,12 +18,12 @@ function Search(config) {
 }
 
 // -- Shorthand ----------------------------------------------------------------
-var doc = Y.config.doc,
-    win = Y.config.win,
+var doc     = Y.config.doc,
+    win     = Y.config.win,
+    history = new Y.HistoryHash(),
 
 Attribute = Y.Attribute,
 DOM       = Y.DOM,
-History   = Y.HistoryLite,
 Lang      = Y.Lang,
 Node      = Y.Node,
 YArray    = Y.Array,
@@ -134,7 +134,7 @@ ATTRS[PENDING_QUERY] = {
 ATTRS[QUERY] = {
   readOnly: true,
   valueFn : function () {
-    return Lang.trim(History.get('q')) || null;
+    return Lang.trim(history.get('q') || '') || null;
   }
 };
 
@@ -169,7 +169,7 @@ ATTRS[RESULT_COUNT] = {
   },
 
   valueFn: function () {
-    return +(History.get('count') || 10);
+    return +(history.get('count') || 10);
   }
 };
 
@@ -190,7 +190,7 @@ ATTRS[RESULT_START] = {
   },
 
   valueFn: function () {
-    return +(History.get('start') || 0);
+    return +(history.get('start') || 0);
   }
 };
 
@@ -267,7 +267,7 @@ Y.extend(Search, Y.Base, {
 
   // -- Protected Methods ------------------------------------------------------
   _attachEvents: function () {
-    Y.after('historyLite:change', this._afterHistoryChange, this);
+    Y.after('history:change', this._afterHistoryChange, this);
 
     this.after('pendingQueryChange', this._afterPendingQueryChange);
     this.after('queryChange', this._afterQueryChange);
@@ -420,20 +420,20 @@ Y.extend(Search, Y.Base, {
    * @protected
    */
   _afterHistoryChange: function (e) {
-    var changed   = e.changed,
-        newParsed = e.newParsed,
-        removed   = e.removed;
+    var changed = e.changed,
+        newVal  = e.newVal,
+        removed = e.removed;
 
     if (changed.q || changed.count || changed.start ||
         removed.q || removed.count || removed.start) {
 
       // TODO: Debug _setAttrs(). Why doesn't it work?
-      this._set(QUERY, newParsed.q || null);
-      this.set(RESULT_COUNT, +newParsed.count || 10);
-      this.set(RESULT_START, +newParsed.start || 0);
+      this._set(QUERY, newVal.q || null);
+      this.set(RESULT_COUNT, +newVal.count || 10);
+      this.set(RESULT_START, +newVal.start || 0);
 
       if (!removed.q) {
-        this.fire(EVT_SEARCH, {query: newParsed.q});
+        this.fire(EVT_SEARCH, {query: newVal.q});
       }
     }
   },
@@ -523,7 +523,7 @@ Y.extend(Search, Y.Base, {
   _onSubmit: function (e) {
     e.preventDefault();
 
-    History.add({
+    history.add({
       q    : this.get(PENDING_QUERY),
       count: null,
       start: null
@@ -587,7 +587,7 @@ Y.namespace('Jetpants').Search = new Search({contentBox: SELECTOR_CONTENT_BOX});
 
 }, '1.0.0', {
     requires: [
-      'base-base', 'event', 'event-custom', 'history-lite', 'io-base',
+      'base-base', 'event', 'event-custom', 'history-hash', 'io-base',
       'jetpants-result-module', 'json-parse', 'node-base'
     ]
 });
